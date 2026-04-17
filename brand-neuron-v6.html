@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brand Neuron</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=Space+Mono&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#030308;color:#fff;font-family:'Space Grotesk',sans-serif}
+:root{--c1:#ff6b6b;--c2:#51cf66;--c3:#4dabf7;--c4:#cc5de8;--c5:#ffd43b;--c6:#868e96}
+
+#bg{position:fixed;inset:0;z-index:0;pointer-events:none}
+#cv{position:fixed;inset:0;z-index:1;cursor:grab}
+#cv:active{cursor:grabbing}
+
+/* HUD */
+.hud{position:fixed;top:0;left:0;right:0;z-index:30;padding:14px 22px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(to bottom,rgba(3,3,8,.97) 55%,transparent);pointer-events:none}
+.logo{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.18em;color:rgba(255,255,255,.28);text-transform:uppercase}
+.logo b{color:rgba(160,140,255,.75);font-weight:400}
+.api-pill{pointer-events:all;display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:6px 13px}
+.api-pill label{font-size:9px;color:rgba(255,255,255,.25);letter-spacing:.1em;text-transform:uppercase}
+.api-pill input{background:none;border:none;outline:none;color:rgba(255,255,255,.6);font-family:'Space Mono',monospace;font-size:11px;width:175px}
+.led{width:5px;height:5px;border-radius:50%;background:#333;flex-shrink:0;transition:all .3s}
+.led.on{background:#51cf66;box-shadow:0 0 6px #51cf66}
+
+/* LEGEND */
+.legend{position:fixed;left:18px;top:50%;transform:translateY(-50%);z-index:30;display:flex;flex-direction:column;gap:5px}
+.lg{display:flex;align-items:center;gap:7px;padding:4px 9px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05)}
+.lg-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.lg-name{font-size:10px;color:rgba(255,255,255,.38);white-space:nowrap}
+.lg-n{font-family:'Space Mono',monospace;font-size:9px;color:rgba(255,255,255,.2);min-width:8px;text-align:right}
+
+/* SIDE PANEL */
+.side{position:fixed;right:0;top:0;bottom:0;width:290px;z-index:20;background:rgba(4,4,14,.93);border-left:1px solid rgba(255,255,255,.06);backdrop-filter:blur(14px);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1)}
+.side.open{transform:translateX(0)}
+.side-tabs{display:flex;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0}
+.stab{flex:1;padding:11px 0;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.3);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .2s;font-family:'Space Grotesk',sans-serif}
+.stab.on{color:rgba(255,255,255,.75);border-bottom-color:rgba(160,140,255,.6)}
+.side-body{flex:1;overflow-y:auto;padding:14px}
+.side-body::-webkit-scrollbar{width:3px}
+.side-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+
+/* ROADMAP */
+.ph-block{margin-bottom:18px}
+.ph-hd{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.ph-num{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:9px;flex-shrink:0}
+.ph-period{font-size:9px;color:rgba(255,255,255,.25);letter-spacing:.07em;text-transform:uppercase}
+.ph-name{font-size:12px;color:rgba(255,255,255,.7);font-weight:500}
+.task{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);border-radius:7px;padding:9px 10px;margin-bottom:5px;display:flex;gap:8px}
+.task-bar{width:2px;border-radius:1px;flex-shrink:0;min-height:28px}
+.task-title{font-size:11px;color:rgba(255,255,255,.65);font-weight:500;margin-bottom:2px}
+.task-desc{font-size:10px;color:rgba(255,255,255,.3);line-height:1.5}
+.task-kpi{font-size:9px;font-family:'Space Mono',monospace;color:rgba(81,207,102,.55);margin-top:3px}
+.rp-status{padding:16px;text-align:center;font-size:11px;color:rgba(255,255,255,.22);line-height:1.7}
+.rp-loading{display:flex;align-items:center;justify-content:center;gap:8px;padding:20px;font-size:11px;color:rgba(160,140,255,.5)}
+.spin{width:14px;height:14px;border:1.5px solid rgba(160,140,255,.2);border-top-color:rgba(160,140,255,.7);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* SAVED LIST */
+.saved-item{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:10px 12px;margin-bottom:7px;cursor:pointer;transition:all .2s}
+.saved-item:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12)}
+.saved-date{font-size:9px;color:rgba(255,255,255,.25);letter-spacing:.06em;margin-bottom:3px}
+.saved-kws{font-size:11px;color:rgba(255,255,255,.55);line-height:1.5}
+.saved-cnt{font-size:9px;color:rgba(160,140,255,.5);margin-top:3px}
+.saved-del{float:right;font-size:11px;color:rgba(255,255,255,.2);cursor:pointer;padding:0 2px}
+.saved-del:hover{color:rgba(255,100,100,.6)}
+.no-saved{padding:20px;text-align:center;font-size:11px;color:rgba(255,255,255,.2)}
+
+/* SAVE BTN */
+.save-btn{width:100%;margin-bottom:12px;padding:9px;background:rgba(160,140,255,.12);border:1px solid rgba(160,140,255,.2);border-radius:8px;color:rgba(160,140,255,.8);font-family:'Space Grotesk',sans-serif;font-size:11px;cursor:pointer;transition:all .2s}
+.save-btn:hover{background:rgba(160,140,255,.2)}
+.save-btn:disabled{opacity:.35;cursor:not-allowed}
+
+/* TOGGLE */
+.side-toggle{position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:31;background:rgba(4,4,14,.9);border:1px solid rgba(255,255,255,.07);border-right:none;border-radius:7px 0 0 7px;padding:10px 7px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:3px}
+.side-toggle:hover{background:rgba(255,255,255,.05)}
+.toggle-label{font-size:8px;color:rgba(255,255,255,.28);letter-spacing:.08em;writing-mode:vertical-rl;text-transform:uppercase}
+.toggle-badge{width:15px;height:15px;border-radius:50%;background:rgba(160,140,255,.55);font-size:8px;display:none;align-items:center;justify-content:center;font-family:'Space Mono',monospace;color:#fff}
+.toggle-badge.on{display:flex}
+
+/* BOTTOM */
+.bottom{position:fixed;bottom:0;left:0;right:0;z-index:30;display:flex;flex-direction:column;align-items:center;padding:24px 20px 22px;background:linear-gradient(to top,rgba(3,3,8,.98) 45%,rgba(3,3,8,.55) 78%,transparent)}
+.input-wrap{position:relative;width:min(540px,80vw)}
+.kw-inp{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.11);border-radius:30px;color:#fff;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:300;padding:12px 76px 12px 22px;outline:none;transition:all .25s;backdrop-filter:blur(14px)}
+.kw-inp:focus{border-color:rgba(160,140,255,.35);background:rgba(255,255,255,.07);box-shadow:0 0 24px rgba(100,60,255,.1)}
+.kw-inp::placeholder{color:rgba(255,255,255,.17)}
+.clear-btn{position:absolute;right:7px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:15px;color:rgba(255,255,255,.38);font-family:'Space Grotesk',sans-serif;font-size:10px;padding:5px 11px;cursor:pointer;transition:all .2s}
+.clear-btn:hover{color:#fff;background:rgba(255,255,255,.1)}
+
+.tags{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;margin-top:8px;max-width:min(600px,82vw);max-height:50px;overflow:hidden}
+.tag{padding:2px 9px;border-radius:13px;font-size:10px;border:1px solid rgba(255,255,255,.07);color:rgba(255,255,255,.33);background:rgba(255,255,255,.03);transition:all .4s}
+.tag.done{border-color:var(--tc);color:var(--tc);background:color-mix(in srgb,var(--tc) 10%,transparent)}
+.hint{margin-top:7px;font-size:10px;color:rgba(255,255,255,.15);letter-spacing:.04em}
+
+/* STATUS BADGE */
+.status{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:40;padding:4px 14px;border-radius:14px;font-size:10px;letter-spacing:.07em;display:none;transition:all .3s}
+.status.classify{background:rgba(100,60,255,.12);border:1px solid rgba(100,60,255,.25);color:rgba(180,160,255,.8);display:block;animation:blink 1.3s ease infinite}
+.status.success{background:rgba(81,207,102,.1);border:1px solid rgba(81,207,102,.25);color:rgba(81,207,102,.8);display:block}
+.status.error{background:rgba(255,100,100,.1);border:1px solid rgba(255,100,100,.25);color:rgba(255,140,140,.8);display:block}
+@keyframes blink{0%,100%{opacity:.5}50%{opacity:1}}
+
+/* TOOLTIP */
+#tip{position:fixed;pointer-events:none;z-index:60;background:rgba(5,5,18,.96);border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:9px 13px;max-width:200px;opacity:0;transition:opacity .15s;backdrop-filter:blur(10px)}
+#tip.on{opacity:1}
+.tip-cat{font-size:9px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px}
+.tip-name{font-size:13px;font-weight:500;color:#fff;margin-bottom:3px}
+.tip-desc{font-size:10px;color:rgba(255,255,255,.4);line-height:1.5}
+</style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+<canvas id="cv"></canvas>
+
+<!-- HUD -->
+<div class="hud">
+  <div class="logo">Brand <b>Neuron</b></div>
+  <div class="api-pill">
+    <label>API</label>
+    <input id="api-key" type="text" placeholder="sk-ant-..." autocomplete="off" spellcheck="false">
+    <div class="led" id="led"></div>
+  </div>
+</div>
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="lg"><div class="lg-dot" style="background:var(--c1)"></div><span class="lg-name">브랜드 정체성</span><span class="lg-n" id="n0"></span></div>
+  <div class="lg"><div class="lg-dot" style="background:var(--c2)"></div><span class="lg-name">타겟 / 고객</span><span class="lg-n" id="n1"></span></div>
+  <div class="lg"><div class="lg-dot" style="background:var(--c3)"></div><span class="lg-name">채널 / 미디어</span><span class="lg-n" id="n2"></span></div>
+  <div class="lg"><div class="lg-dot" style="background:var(--c4)"></div><span class="lg-name">콘텐츠</span><span class="lg-n" id="n3"></span></div>
+  <div class="lg"><div class="lg-dot" style="background:var(--c5)"></div><span class="lg-name">수익 / 성장</span><span class="lg-n" id="n4"></span></div>
+  <div class="lg"><div class="lg-dot" style="background:var(--c6)"></div><span class="lg-name">기타</span><span class="lg-n" id="n5"></span></div>
+</div>
+
+<!-- SIDE TOGGLE -->
+<div class="side-toggle" id="side-toggle" onclick="toggleSide()">
+  <div class="toggle-badge on" id="tbadge">0</div>
+  <div class="toggle-label">패널</div>
+</div>
+
+<!-- SIDE PANEL -->
+<div class="side" id="side">
+  <div class="side-tabs">
+    <button class="stab on" id="tab-rm" onclick="switchTab('roadmap')">로드맵</button>
+    <button class="stab" id="tab-sv" onclick="switchTab('saved')">저장목록</button>
+  </div>
+  <div class="side-body" id="side-body">
+    <div class="rp-status">키워드를 입력하면<br>로드맵이 자동 생성됩니다</div>
+  </div>
+</div>
+
+<!-- BOTTOM -->
+<div class="bottom">
+  <div class="input-wrap">
+    <input class="kw-inp" id="kw" placeholder="떠오르는 키워드를 입력하고 Enter" autocomplete="off" spellcheck="false">
+    <button class="clear-btn" onclick="clearAll()">초기화</button>
+  </div>
+  <div class="tags" id="tags"></div>
+  <div class="hint">Enter로 추가 · 드래그로 이동 · 카테고리별 자동 군집 · 분류 완료 시 로드맵 자동 생성</div>
+</div>
+
+<!-- STATUS BADGE -->
+<div class="status" id="status"></div>
+
+<!-- TOOLTIP -->
+<div id="tip"><div class="tip-cat" id="tc"></div><div class="tip-name" id="tn"></div><div class="tip-desc" id="td"></div></div>
+
+<script>
+// ══════════════════════════════════
+//  CONFIG
+// ══════════════════════════════════
+const COLORS = {
+  '브랜드 정체성':'#ff6b6b',
+  '타겟':'#51cf66',
+  '채널':'#4dabf7',
+  '콘텐츠':'#cc5de8',
+  '수익':'#ffd43b',
+  '기타':'#868e96'
+};
+const CAT_ANGLES = {
+  '브랜드 정체성': -Math.PI/2,
+  '타겟':  Math.PI/6,
+  '채널':  Math.PI*5/6,
+  '수익':  Math.PI/2,
+  '콘텐츠':-Math.PI*5/6,
+  '기타':  -Math.PI/6
+};
+const CATS = Object.keys(COLORS);
+
+// ══════════════════════════════════
+//  STATE
+// ══════════════════════════════════
+let nodes=[], edges=[];
+let panX=0, panY=0, dragNode=null, dragPan=false;
+let psx=0, psy=0, mdx=0, mdy=0;
+let hoveredNode=null;
+let classifyQueue=[], classifyTimer=null, classifying=false;
+let roadmapTimer=null, currentRoadmap=null;
+let currentTab='roadmap', sideOpen=false;
+
+// ══════════════════════════════════
+//  STARFIELD
+// ══════════════════════════════════
+(()=>{
+  const c=document.getElementById('bg'), x=c.getContext('2d');
+  let S=[];
+  const init=()=>{
+    c.width=innerWidth; c.height=innerHeight;
+    S=Array.from({length:220},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*1.2,a:Math.random()*.7,sp:2e-4+Math.random()*4e-4,ph:Math.random()*Math.PI*2}));
+  };
+  const draw=()=>{
+    x.clearRect(0,0,c.width,c.height);
+    const t=Date.now();
+    S.forEach(s=>{x.beginPath();x.arc(s.x,s.y,s.r,0,Math.PI*2);x.fillStyle=`rgba(255,255,255,${s.a*(0.25+0.75*Math.sin(t*s.sp+s.ph))})`;x.fill()});
+    requestAnimationFrame(draw);
+  };
+  init(); window.addEventListener('resize',init); draw();
+})();
+
+// ══════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════
+function cc(cat){ return COLORS[cat]||'#868e96'; }
+function ha(hex,a){
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${Math.max(0,Math.min(1,a))})`;
+}
+function getKey(){ return document.getElementById('api-key').value.trim(); }
+
+function showStatus(msg, type='classify', dur=0){
+  const el=document.getElementById('status');
+  el.textContent=msg; el.className='status '+type;
+  if(dur>0) setTimeout(()=>el.className='status',dur);
+}
+function hideStatus(){ document.getElementById('status').className='status'; }
+
+// ══════════════════════════════════
+//  INIT
+// ══════════════════════════════════
+window.addEventListener('DOMContentLoaded',()=>{
+  const saved=localStorage.getItem('bn_key');
+  if(saved){ document.getElementById('api-key').value=saved; document.getElementById('led').classList.add('on'); }
+  document.getElementById('api-key').addEventListener('input',e=>{
+    const v=e.target.value.trim();
+    localStorage.setItem('bn_key',v);
+    document.getElementById('led').classList.toggle('on',v.startsWith('sk-'));
+  });
+
+  const inp=document.getElementById('kw');
+  inp.addEventListener('keydown',e=>{
+    if(e.key==='Enter'){
+      if(e.isComposing||e.keyCode===229) return;
+      e.preventDefault();
+      const v=inp.value.trim();
+      if(v){ addKeyword(v); inp.value=''; }
+    }
+  });
+  inp.addEventListener('paste',e=>{
+    e.preventDefault();
+    e.clipboardData.getData('text').split(/\n/).map(s=>s.trim()).filter(Boolean).forEach(addKeyword);
+    inp.value='';
+  });
+
+  const cv=document.getElementById('cv');
+  cv.width=innerWidth; cv.height=innerHeight;
+  window.addEventListener('resize',()=>{ cv.width=innerWidth; cv.height=innerHeight; });
+
+  renderLoop();
+  renderSaved(); // 저장 목록 초기 렌더
+});
+
+// ══════════════════════════════════
+//  PANEL
+// ══════════════════════════════════
+function toggleSide(){
+  sideOpen=!sideOpen;
+  document.getElementById('side').classList.toggle('open',sideOpen);
+}
+function switchTab(tab){
+  currentTab=tab;
+  document.getElementById('tab-rm').classList.toggle('on',tab==='roadmap');
+  document.getElementById('tab-sv').classList.toggle('on',tab==='saved');
+  if(tab==='roadmap') renderRoadmapPanel();
+  else renderSaved();
+}
+
+// ══════════════════════════════════
+//  KEYWORD
+// ══════════════════════════════════
+function addKeyword(label){
+  if(!label||nodes.find(n=>n.label===label)) return;
+  const id='n'+Date.now()+Math.random().toString(36).slice(2,5);
+  const cx=innerWidth/2-panX, cy=innerHeight/2-panY-60;
+  nodes.push({
+    id, label, category:'기타', importance:3, description:'',
+    x:cx+(Math.random()-.5)*100, y:cy+(Math.random()-.5)*100,
+    vx:(Math.random()-.5), vy:(Math.random()-.5),
+    r:14, color:'#868e96', opacity:0, targetX:null, targetY:null
+  });
+  // 태그
+  const d=document.createElement('div');
+  d.className='tag'; d.textContent=label; d.dataset.id=id;
+  document.getElementById('tags').appendChild(d);
+
+  scheduleClassify(id);
+  updateLegend();
+}
+
+// ══════════════════════════════════
+//  CLASSIFY  ← 핵심
+// ══════════════════════════════════
+function scheduleClassify(id){
+  classifyQueue.push(id);
+  clearTimeout(classifyTimer);
+  classifyTimer=setTimeout(runClassify, 800);
+}
+
+async function runClassify(){
+  if(classifying) return;
+  classifying=true;
+  showStatus('● AI 카테고리 분류 중...','classify');
+
+  const key=getKey();
+  if(!key){
+    // API 키 없으면 노드만 표시
+    nodes.forEach(n=>{ if(n.opacity<1) n.opacity=1; });
+    classifyQueue=[];
+    hideStatus();
+    classifying=false;
+    return;
+  }
+
+  classifyQueue=[];
+  const allNodes=nodes.map(n=>({id:n.id,label:n.label}));
+
+  const SYS=`당신은 브랜드 전략 전문가입니다.
+입력된 키워드를 아래 6개 카테고리로 정확히 분류하고, 노드 간 전략적 연결(엣지)을 생성하세요.
+반드시 순수 JSON만 반환. 마크다운·설명 절대 없이.
+
+카테고리 (이 6개 중 정확히 하나):
+- 브랜드 정체성 : 미션, 비전, 가치, 슬로건, 포지셔닝, 로고, 디자인 시스템
+- 타겟 : 고객 세그먼트, 페르소나, 연령대, 라이프스타일, 니즈
+- 채널 : SNS, 플랫폼, 유통망, 광고매체, 오프라인 거점
+- 콘텐츠 : 크리에이티브, 캠페인, 스토리텔링, UGC, 소재 유형
+- 수익 : 가격전략, 매출목표, 프로모션, 구독, 리텐션, LTV
+- 기타 : 위 5개 외 모든 것
+
+출력 JSON:
+{
+  "nodes":[
+    {"id":"노드id","category":"카테고리명","importance":1~5,"description":"이 키워드의 전략적 역할 (15자 이내)"}
+  ],
+  "edges":[
+    {"from":"노드id","to":"노드id","strength":1~3}
+  ]
+}
+
+엣지 strength:
+3 = 직접 실행 연결 (타겟이 채널 선택을 결정, 브랜드가 콘텐츠 방향 결정)
+2 = 전략적 시너지 (함께 강화되는 관계)
+1 = 간접 연관
+
+엣지 필수 규칙:
+- 모든 노드 최소 1개 이상의 엣지 보유
+- 총 엣지 수: 노드 수 × 1~2배
+- 같은 카테고리 내 키워드끼리도 연결`;
+
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key':key,
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-allow-browser':'true'
+      },
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:2000,
+        system:SYS,
+        messages:[{role:'user',content:`전체 키워드 목록:\n${JSON.stringify(allNodes)}`}]
+      })
+    });
+
+    if(!resp.ok){
+      const t=await resp.text().catch(()=>'');
+      throw new Error(`API ${resp.status}: ${t.slice(0,80)}`);
+    }
+
+    const data=await resp.json();
+    if(data.error) throw new Error(data.error.message);
+
+    const raw=data.content?.[0]?.text||'';
+    const m=raw.match(/\{[\s\S]*\}/);
+    if(!m) throw new Error('JSON 없음');
+    const parsed=JSON.parse(m[0]);
+
+    // ── 노드 분류 적용 ──
+    (parsed.nodes||[]).forEach(r=>{
+      const n=nodes.find(x=>x.id===r.id); if(!n) return;
+      n.category = CATS.includes(r.category) ? r.category : '기타';
+      n.importance = Math.max(1,Math.min(5,r.importance||3));
+      n.description = r.description||'';
+      n.color = cc(n.category);
+      n.r = 10+n.importance*3;
+      setTarget(n);
+      // 태그 업데이트
+      const tag=document.querySelector(`.tag[data-id="${n.id}"]`);
+      if(tag){ tag.classList.add('done'); tag.style.setProperty('--tc',n.color); }
+    });
+    recalcTargets();
+
+    // ── 엣지 적용 ──
+    const valid=(parsed.edges||[]).filter(e=>e.from!==e.to&&nodes.find(n=>n.id===e.from)&&nodes.find(n=>n.id===e.to));
+    edges = valid.length>0 ? valid : fallbackEdges();
+
+    updateLegend();
+    showStatus('✓ 분류 완료','success',2000);
+    scheduleRoadmap();
+
+  }catch(err){
+    console.error('classify:',err);
+    showStatus('분류 실패: '+err.message.slice(0,40),'error',3000);
+    nodes.forEach(n=>{ if(n.opacity<1) n.opacity=1; });
+  }
+
+  classifying=false;
+  if(classifyQueue.length>0) setTimeout(runClassify,300);
+}
+
+// ══════════════════════════════════
+//  CLUSTER TARGETS
+// ══════════════════════════════════
+function setTarget(node){
+  const cx=innerWidth/2-panX, cy=innerHeight/2-panY-60;
+  const angle=CAT_ANGLES[node.category]??0;
+  const R=Math.min(innerWidth,innerHeight)*0.27;
+  const siblings=nodes.filter(n=>n.category===node.category);
+  const idx=siblings.indexOf(node);
+  const total=siblings.length;
+  const spread=total>1?(idx/(total-1)-.5)*0.65:0;
+  node.targetX=cx+R*Math.cos(angle+spread);
+  node.targetY=cy+R*Math.sin(angle+spread);
+}
+function recalcTargets(){ nodes.forEach(setTarget); }
+
+function fallbackEdges(){
+  const e=[], by={};
+  nodes.forEach(n=>{ if(!by[n.category]) by[n.category]=[]; by[n.category].push(n); });
+  Object.values(by).forEach(g=>{ for(let i=0;i<g.length;i++) for(let j=i+1;j<g.length;j++) e.push({from:g[i].id,to:g[j].id,strength:2}); });
+  [['브랜드 정체성','타겟'],['타겟','채널'],['채널','콘텐츠'],['콘텐츠','수익'],['브랜드 정체성','수익']].forEach(([a,b])=>{
+    (by[a]||[]).slice(0,1).forEach(na=>(by[b]||[]).slice(0,1).forEach(nb=>e.push({from:na.id,to:nb.id,strength:1})));
+  });
+  return e;
+}
+
+// ══════════════════════════════════
+//  ROADMAP (자동)
+// ══════════════════════════════════
+function scheduleRoadmap(){
+  clearTimeout(roadmapTimer);
+  if(nodes.filter(n=>n.category!=='기타').length<2) return;
+  roadmapTimer=setTimeout(runRoadmap,1000);
+}
+
+async function runRoadmap(){
+  const key=getKey(); if(!key) return;
+  const cls=nodes.filter(n=>n.category!=='기타'); if(cls.length<2) return;
+
+  if(!sideOpen){ sideOpen=true; document.getElementById('side').classList.add('open'); }
+  if(currentTab==='roadmap'){
+    document.getElementById('side-body').innerHTML='<div class="rp-loading"><div class="spin"></div>로드맵 생성 중...</div>';
+  }
+
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-allow-browser':'true'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1800,
+        system:`브랜드 전략 로드맵 전문가. 순수 JSON만. 마크다운 금지.
+출력: {"roadmap":[{"phase":1,"period":"기간","name":"단계명","color":"#hex","tasks":[{"title":"과제","description":"실행방법(25자이내)","category":"카테고리","kpi":"KPI(15자이내)"}]}]}
+3페이즈, 각 3~4 tasks, 한국어, 간결하게.`,
+        messages:[{role:'user',content:cls.map(n=>`[${n.category}] ${n.label}${n.description?' — '+n.description:''}`).join('\n')}]
+      })
+    });
+    if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const data=await resp.json();
+    if(data.error) throw new Error(data.error.message);
+    const raw=data.content?.[0]?.text||'';
+    const m=raw.match(/\{[\s\S]*\}/); if(!m) throw new Error('no JSON');
+    currentRoadmap=JSON.parse(m[0]).roadmap||[];
+    document.getElementById('tbadge').textContent=nodes.length;
+    if(currentTab==='roadmap') renderRoadmapPanel();
+  }catch(e){
+    console.error('roadmap:',e);
+    if(currentTab==='roadmap') document.getElementById('side-body').innerHTML=`<div class="rp-status">생성 실패<br>${e.message.slice(0,50)}</div>`;
+  }
+}
+
+function renderRoadmapPanel(){
+  const body=document.getElementById('side-body');
+  if(!currentRoadmap||!currentRoadmap.length){
+    body.innerHTML='<div class="rp-status">키워드를 입력하면<br>로드맵이 자동 생성됩니다</div>'; return;
+  }
+  const pColors=['#ff6b6b','#4dabf7','#cc5de8','#ffd43b'];
+  body.innerHTML=`
+    <button class="save-btn" onclick="saveRoadmap()" ${!currentRoadmap?'disabled':''}>현재 로드맵 저장</button>
+    ${currentRoadmap.map((p,i)=>{
+      const col=p.color||pColors[i%4];
+      return `<div class="ph-block">
+        <div class="ph-hd">
+          <div class="ph-num" style="background:${col}18;color:${col};border:1px solid ${col}44">${p.phase}</div>
+          <div><div class="ph-period">${p.period}</div><div class="ph-name">${p.name}</div></div>
+        </div>
+        ${(p.tasks||[]).map(t=>`
+        <div class="task">
+          <div class="task-bar" style="background:${cc(t.category)}"></div>
+          <div>
+            <div class="task-title">${t.title}</div>
+            <div class="task-desc">${t.description}</div>
+            ${t.kpi?`<div class="task-kpi">▸ ${t.kpi}</div>`:''}
+          </div>
+        </div>`).join('')}
+      </div>`;
+    }).join('')}`;
+}
+
+// ══════════════════════════════════
+//  SAVE / LOAD
+// ══════════════════════════════════
+function saveRoadmap(){
+  if(!currentRoadmap||!nodes.length) return;
+  const saves=JSON.parse(localStorage.getItem('bn_saves')||'[]');
+  const item={
+    id: Date.now(),
+    date: new Date().toLocaleString('ko-KR',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}),
+    keywords: nodes.map(n=>n.label),
+    categories: nodes.map(n=>({label:n.label,category:n.category})),
+    roadmap: currentRoadmap
+  };
+  saves.unshift(item);
+  if(saves.length>10) saves.pop(); // 최대 10개
+  localStorage.setItem('bn_saves',JSON.stringify(saves));
+  showStatus('✓ 로드맵 저장됨','success',2000);
+}
+
+function renderSaved(){
+  const body=document.getElementById('side-body');
+  const saves=JSON.parse(localStorage.getItem('bn_saves')||'[]');
+  if(!saves.length){ body.innerHTML='<div class="no-saved">저장된 로드맵이 없습니다</div>'; return; }
+  body.innerHTML=saves.map(s=>`
+    <div class="saved-item" onclick="loadSave(${s.id})">
+      <div class="saved-del" onclick="event.stopPropagation();deleteSave(${s.id})">✕</div>
+      <div class="saved-date">${s.date}</div>
+      <div class="saved-kws">${s.keywords.slice(0,6).join(', ')}${s.keywords.length>6?` 외 ${s.keywords.length-6}개`:''}</div>
+      <div class="saved-cnt">${s.keywords.length}개 키워드 · ${(s.roadmap||[]).length}단계</div>
+    </div>`).join('');
+}
+
+function loadSave(id){
+  const saves=JSON.parse(localStorage.getItem('bn_saves')||'[]');
+  const item=saves.find(s=>s.id===id); if(!item) return;
+  // 키워드 복원
+  clearAll(true);
+  (item.categories||[]).forEach(c=>{
+    const existing=nodes.find(n=>n.label===c.label);
+    if(!existing){
+      // addKeyword 없이 직접 삽입 (API 재호출 방지)
+      const iid='n'+Date.now()+Math.random().toString(36).slice(2,5);
+      const cx=innerWidth/2-panX, cy=innerHeight/2-panY-60;
+      const node={
+        id:iid, label:c.label, category:c.category, importance:3, description:'',
+        x:cx+(Math.random()-.5)*120, y:cy+(Math.random()-.5)*120,
+        vx:0, vy:0, r:10+3*3, color:cc(c.category), opacity:1,
+        targetX:null, targetY:null
+      };
+      nodes.push(node);
+      setTarget(node);
+      const d=document.createElement('div');
+      d.className='tag done'; d.textContent=c.label; d.dataset.id=iid;
+      d.style.setProperty('--tc',cc(c.category));
+      document.getElementById('tags').appendChild(d);
+    }
+  });
+  edges=fallbackEdges();
+  currentRoadmap=item.roadmap;
+  updateLegend();
+  switchTab('roadmap');
+  showStatus('✓ 불러오기 완료','success',2000);
+}
+
+function deleteSave(id){
+  let saves=JSON.parse(localStorage.getItem('bn_saves')||'[]');
+  saves=saves.filter(s=>s.id!==id);
+  localStorage.setItem('bn_saves',JSON.stringify(saves));
+  renderSaved();
+}
+
+// ══════════════════════════════════
+//  STATS / LEGEND
+// ══════════════════════════════════
+function updateLegend(){
+  ['브랜드 정체성','타겟','채널','콘텐츠','수익','기타'].forEach((c,i)=>{
+    const el=document.getElementById('n'+i); if(!el) return;
+    const cnt=nodes.filter(n=>n.category===c).length;
+    el.textContent=cnt>0?cnt:'';
+  });
+  document.getElementById('tbadge').textContent=nodes.length;
+}
+
+// ══════════════════════════════════
+//  RENDER LOOP
+// ══════════════════════════════════
+const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
+
+function renderLoop(){
+  ctx.clearRect(0,0,cv.width,cv.height);
+  if(nodes.length>0){
+    ctx.save(); ctx.translate(panX,panY);
+    drawClusters(); drawEdges(); physicsAndNodes();
+    ctx.restore();
+  }
+  requestAnimationFrame(renderLoop);
+}
+
+function drawClusters(){
+  const cx=cv.width/2-panX, cy=cv.height/2-panY-60;
+  const R=Math.min(cv.width,cv.height)*0.27;
+  Object.entries(CAT_ANGLES).forEach(([cat,angle])=>{
+    const cnt=nodes.filter(n=>n.category===cat).length; if(!cnt) return;
+    const ax=cx+R*Math.cos(angle), ay=cy+R*Math.sin(angle);
+    const r=38+cnt*12;
+    const g=ctx.createRadialGradient(ax,ay,0,ax,ay,r);
+    g.addColorStop(0,ha(cc(cat),.1)); g.addColorStop(.55,ha(cc(cat),.03)); g.addColorStop(1,'transparent');
+    ctx.beginPath(); ctx.arc(ax,ay,r,0,Math.PI*2); ctx.fillStyle=g; ctx.fill();
+    ctx.font='300 9px Space Grotesk'; ctx.textAlign='center';
+    ctx.fillStyle=ha(cc(cat),.32); ctx.fillText(cat,ax,ay-r-5);
+  });
+}
+
+function drawEdges(){
+  edges.forEach(e=>{
+    const fn=nodes.find(n=>n.id===e.from), tn=nodes.find(n=>n.id===e.to); if(!fn||!tn) return;
+    const op=Math.min(fn.opacity,tn.opacity), s=e.strength||1;
+    const dx=tn.x-fn.x, dy=tn.y-fn.y, d=Math.sqrt(dx*dx+dy*dy)||1;
+    const ox=-dy/d*14, oy=dx/d*14;
+    ctx.beginPath();
+    ctx.moveTo(fn.x,fn.y);
+    ctx.quadraticCurveTo((fn.x+tn.x)/2+ox,(fn.y+tn.y)/2+oy,tn.x,tn.y);
+    if(s===3){
+      const g=ctx.createLinearGradient(fn.x,fn.y,tn.x,tn.y);
+      g.addColorStop(0,ha(fn.color,op*.6)); g.addColorStop(1,ha(tn.color,op*.6));
+      ctx.strokeStyle=g; ctx.lineWidth=1.6; ctx.setLineDash([]);
+    } else if(s===2){
+      ctx.strokeStyle=`rgba(255,255,255,${op*.13})`; ctx.lineWidth=.8; ctx.setLineDash([]);
+    } else {
+      ctx.strokeStyle=`rgba(255,255,255,${op*.05})`; ctx.lineWidth=.5; ctx.setLineDash([3,5]);
+    }
+    ctx.stroke(); ctx.setLineDash([]);
+  });
+}
+
+function physicsAndNodes(){
+  const cx=cv.width/2-panX, cy=cv.height/2-panY-60;
+  nodes.forEach(n=>{
+    if(dragNode!==n){
+      // 클러스터 인력
+      if(n.targetX!=null){ n.vx+=(n.targetX-n.x)*.013; n.vy+=(n.targetY-n.y)*.013; }
+      else { n.vx+=(cx-n.x)*.002; n.vy+=(cy-n.y)*.002; }
+      // 반발
+      nodes.forEach(m=>{
+        if(m===n) return;
+        const dx=n.x-m.x, dy=n.y-m.y, d=Math.sqrt(dx*dx+dy*dy)||1;
+        const min=n.r+m.r+24;
+        if(d<min){ const f=(min-d)/min*.5; n.vx+=dx/d*f; n.vy+=dy/d*f; }
+      });
+      n.vx*=.84; n.vy*=.84; n.x+=n.vx; n.y+=n.vy;
+    }
+    n.opacity=Math.min(1,(n.opacity||0)+.05);
+  });
+
+  nodes.forEach(n=>{
+    const op=n.opacity; if(op<=0) return;
+    const hov=n===hoveredNode;
+    // 글로우
+    const gr=ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,n.r*(hov?3.4:2.2));
+    gr.addColorStop(0,ha(n.color,op*(hov?.42:.2))); gr.addColorStop(1,'transparent');
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r*(hov?3.4:2.2),0,Math.PI*2); ctx.fillStyle=gr; ctx.fill();
+    if(hov){ ctx.beginPath(); ctx.arc(n.x,n.y,n.r+5,0,Math.PI*2); ctx.strokeStyle=ha(n.color,.52); ctx.lineWidth=1; ctx.stroke(); }
+    // 노드
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2); ctx.fillStyle=ha(n.color,op*.88); ctx.fill();
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r*.26,0,Math.PI*2); ctx.fillStyle=ha('#fff',op*.65); ctx.fill();
+    // 라벨
+    const fs=Math.max(9,Math.min(11,n.r*.82));
+    ctx.font=`300 ${fs}px Space Grotesk`; ctx.textAlign='center'; ctx.textBaseline='top';
+    const tw=ctx.measureText(n.label).width;
+    ctx.fillStyle=`rgba(3,3,8,${op*.65})`;
+    ctx.beginPath();
+    if(ctx.roundRect) ctx.roundRect(n.x-tw/2-3,n.y+n.r+3,tw+6,12,2);
+    else ctx.rect(n.x-tw/2-3,n.y+n.r+3,tw+6,12);
+    ctx.fill();
+    ctx.fillStyle=`rgba(255,255,255,${op*.78})`; ctx.fillText(n.label,n.x,n.y+n.r+4);
+  });
+}
+
+// ══════════════════════════════════
+//  INTERACTION
+// ══════════════════════════════════
+cv.addEventListener('mousedown',e=>{
+  mdx=e.clientX; mdy=e.clientY;
+  const mx=e.clientX-panX, my=e.clientY-panY;
+  const hit=nodes.find(n=>Math.hypot(n.x-mx,n.y-my)<n.r+10);
+  if(hit) dragNode=hit; else { dragPan=true; psx=panX; psy=panY; }
+});
+cv.addEventListener('mousemove',e=>{
+  const mx=e.clientX-panX, my=e.clientY-panY;
+  if(dragNode){ dragNode.x=mx; dragNode.y=my; dragNode.vx=0; dragNode.vy=0; }
+  else if(dragPan){ panX=psx+(e.clientX-mdx); panY=psy+(e.clientY-mdy); }
+  else{
+    const hit=nodes.find(n=>Math.hypot(n.x-mx,n.y-my)<n.r+10);
+    hoveredNode=hit||null;
+    const tip=document.getElementById('tip');
+    if(hit){
+      document.getElementById('tc').textContent=hit.category;
+      document.getElementById('tc').style.color=hit.color;
+      document.getElementById('tn').textContent=hit.label;
+      document.getElementById('td').textContent=hit.description||'분류 대기 중...';
+      tip.style.left=(e.clientX+14)+'px'; tip.style.top=(e.clientY-8)+'px';
+      tip.classList.add('on'); cv.style.cursor='pointer';
+    } else { tip.classList.remove('on'); cv.style.cursor='grab'; }
+  }
+});
+cv.addEventListener('mouseup',()=>{ dragNode=null; dragPan=false; });
+cv.addEventListener('mouseleave',()=>{ dragNode=null; dragPan=false; hoveredNode=null; document.getElementById('tip').classList.remove('on'); });
+
+// ══════════════════════════════════
+//  CLEAR
+// ══════════════════════════════════
+function clearAll(silent=false){
+  nodes=[]; edges=[]; panX=0; panY=0; currentRoadmap=null;
+  document.getElementById('tags').innerHTML='';
+  document.getElementById('side-body').innerHTML='<div class="rp-status">키워드를 입력하면<br>로드맵이 자동 생성됩니다</div>';
+  document.getElementById('tbadge').textContent='0';
+  updateLegend();
+}
+</script>
+</body>
+</html>

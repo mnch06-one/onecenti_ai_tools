@@ -1,0 +1,3001 @@
+<!DOCTYPE html>
+<!-- saved from url=(0217)file:///Users/jang/Library/Application%20Support/Claude/local-agent-mode-sessions/09b3c30e-33b0-4c3f-abb8-827cca55ec43/294c7e76-a2e9-45d0-b45e-f4fa73217f4f/local_0c934616-788c-4fbe-91a6-3fb0bf4a1c12/outputs/index.html -->
+<html lang="ko"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>pdbox</title>
+<link rel="stylesheet" href="./pdbox_files/pretendard.min.css">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root { color-scheme: dark; }
+body {
+  font-family: Pretendard, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #08080f;
+  color: #e8e8f0;
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* Background Orbs */
+.bg-orbs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; overflow: hidden; }
+.bg-orb { position: absolute; border-radius: 50%; filter: blur(80px); }
+.bg-orb-1 { width: 600px; height: 600px; top: -100px; left: -100px; background: linear-gradient(135deg, #4f46e5, #7c3aed); opacity: 0.5; }
+.bg-orb-2 { width: 500px; height: 500px; top: -50px; right: -80px; background: linear-gradient(135deg, #0ea5e9, #06b6d4); opacity: 0.35; }
+.bg-orb-3 { width: 550px; height: 550px; bottom: -100px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #a855f7, #ec4899); opacity: 0.35; }
+.bg-orb-4 { width: 300px; height: 300px; top: 50%; left: 10%; background: linear-gradient(135deg, #f59e0b, #ef4444); opacity: 0.18; }
+.bg-orb-5 { width: 400px; height: 400px; top: 40%; right: 10%; background: linear-gradient(135deg, #10b981, #06b6d4); opacity: 0.12; }
+.noise-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; opacity: 0.03;
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><filter id="n"><feTurbulence baseFrequency="0.9" numOctaves="4" result="noise"/></filter><rect width="100" height="100" filter="url(%23n)" opacity="0.5"/></svg>');
+}
+
+/* Layout */
+.app-container { position: relative; z-index: 2; max-width: 1200px; margin: 0 auto; padding: 20px; }
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.header h1 { font-size: 24px; font-weight: 700; background: linear-gradient(135deg, #a5b4fc, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.settings-btn { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 8px 12px; color: #e8e8f0; cursor: pointer; font-size: 16px; transition: all 0.2s; }
+.settings-btn:hover { background: rgba(255,255,255,0.1); }
+
+/* Tabs */
+.tab-bar { display: flex; gap: 4px; margin-bottom: 24px; background: rgba(255,255,255,0.04); border-radius: 12px; padding: 4px; }
+.tab-btn { flex: 1; padding: 10px 16px; border: none; background: transparent; color: #8888a0; border-radius: 10px; cursor: pointer; font-family: Pretendard; font-size: 14px; font-weight: 500; transition: all 0.2s; white-space: nowrap; }
+.tab-btn.active { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff; font-weight: 600; }
+.tab-btn:hover:not(.active) { color: #e8e8f0; background: rgba(255,255,255,0.06); }
+.tab-content { display: none; animation: fadeIn 0.3s ease; }
+.tab-content.active { display: block; }
+
+/* Glass Card */
+.glass-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
+
+/* Buttons */
+.btn-primary { background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none; border-radius: 10px; padding: 10px 20px; color: #fff; font-weight: 600; font-family: Pretendard; font-size: 14px; cursor: pointer; transition: all 0.2s; }
+.btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.btn-secondary { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px 20px; color: #e8e8f0; font-family: Pretendard; font-size: 14px; cursor: pointer; transition: all 0.2s; font-weight: 500; }
+.btn-secondary:hover { background: rgba(255,255,255,0.1); }
+.btn-sm { padding: 6px 14px; font-size: 13px; }
+
+/* Inputs */
+input[type="text"], input[type="url"], textarea, input[type="date"], input[type="color"] {
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 10px 14px;
+  color: #e8e8f0; font-family: Pretendard; font-size: 14px; width: 100%; transition: border-color 0.2s; outline: none;
+}
+input:focus, textarea:focus { border-color: rgba(99,102,241,0.5); }
+textarea { resize: vertical; min-height: 80px; }
+label { display: block; font-size: 13px; font-weight: 600; color: #8888a0; margin-bottom: 6px; }
+
+/* Tags */
+.tag-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.tag { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 99px; padding: 5px 14px; font-size: 13px; color: #8888a0; cursor: pointer; transition: all 0.2s; user-select: none; }
+.tag.selected { background: rgba(99,102,241,0.2); border-color: #6366f1; color: #a5b4fc; font-weight: 600; }
+.tag .remove-custom { margin-left: 6px; cursor: pointer; opacity: 0.6; }
+.tag .remove-custom:hover { opacity: 1; }
+.add-custom-tag { background: rgba(99,102,241,0.1); border: 1px dashed rgba(99,102,241,0.3); color: #a5b4fc; }
+.custom-input-wrap { overflow: hidden; max-height: 0; transition: max-height 0.3s ease; }
+.custom-input-wrap.open { max-height: 50px; margin-top: 8px; }
+.custom-input-wrap input { max-width: 200px; }
+
+/* Keyword Chips */
+.chip { display: inline-block; border-radius: 99px; padding: 4px 12px; font-size: 12px; font-weight: 500; margin: 3px; }
+.chip-positioning { background: rgba(99,102,241,0.15); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.3); }
+.chip-feature { background: rgba(52,211,153,0.12); color: #6ee7b7; border: 1px solid rgba(52,211,153,0.25); }
+.chip-target { background: rgba(251,191,36,0.12); color: #fcd34d; border: 1px solid rgba(251,191,36,0.25); }
+.chip-advantage { background: rgba(248,113,113,0.12); color: #fca5a5; border: 1px solid rgba(248,113,113,0.25); }
+
+/* Toast */
+.toast-container { position: fixed; top: 20px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 8px; }
+.toast { padding: 12px 20px; border-radius: 10px; color: #fff; font-size: 14px; font-weight: 500; animation: fadeIn 0.3s ease; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+.toast-success { background: linear-gradient(135deg, #34d399, #06b6d4); }
+.toast-error { background: linear-gradient(135deg, #f87171, #ef4444); }
+.toast-warning { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+.toast-info { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+
+/* Modal */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 9000; display: flex; align-items: center; justify-content: center; }
+.modal { background: #16161f; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 32px; max-width: 440px; width: 90%; animation: fadeIn 0.3s ease; }
+.modal h2 { font-size: 20px; margin-bottom: 8px; }
+.modal p { font-size: 14px; color: #8888a0; margin-bottom: 20px; }
+.modal .btn-row { display: flex; gap: 12px; margin-top: 24px; }
+.modal .btn-row button { flex: 1; }
+
+/* Animations */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeIn 0.3s ease; }
+.spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Section Labels */
+.section-label { font-size: 13px; font-weight: 700; color: #a5b4fc; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+.muted { color: #6b6b80; }
+
+/* Form Layouts */
+.form-row { display: flex; gap: 12px; margin-bottom: 14px; }
+.form-row > div { flex: 1; }
+.form-col { margin-bottom: 14px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+@media(max-width:768px) { .grid-2 { grid-template-columns: 1fr; } .grid-3 { grid-template-columns: 1fr; } }
+
+/* Highlights & Info Cards */
+.highlight-purple { background: rgba(99,102,241,0.1); border-left: 3px solid #6366f1; padding: 16px; border-radius: 10px; }
+.highlight-purple h3 { font-size: 20px; color: #a5b4fc; margin-bottom: 6px; }
+.highlight-purple p { font-size: 14px; color: #b0b0c0; line-height: 1.6; }
+
+.color-row { display: flex; gap: 16px; flex-wrap: wrap; }
+.color-item { display: flex; align-items: center; gap: 10px; }
+.color-swatch { width: 50px; height: 50px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; }
+.color-name { font-size: 13px; font-weight: 600; color: #e8e8f0; }
+
+.info-grid-card { display: flex; flex-direction: column; }
+.info-title { font-size: 12px; font-weight: 700; color: #a5b4fc; margin-bottom: 8px; }
+.info-body { font-size: 14px; color: #b0b0c0; line-height: 1.5; }
+
+/* Reference Image Zone (New) */
+.ref-image-zone {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 16px;
+  background: rgba(255,255,255,0.02);
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.06);
+  min-height: 420px;
+}
+
+.ref-zone-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #a5b4fc;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+  display: block;
+  width: 100%;
+}
+
+.ref-zone-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ref-zone-controls {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.ref-zone-controls .btn-secondary {
+  padding: 6px 12px;
+  font-size: 12px;
+  flex: 1;
+  min-width: 80px;
+}
+
+.ref-images-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 8px;
+  padding: 12px;
+  background: rgba(255,255,255,0.015);
+  border-radius: 8px;
+  border: 1px dashed rgba(255,255,255,0.08);
+  min-height: 200px;
+  position: relative;
+}
+
+.ref-images-grid.dragover {
+  border-color: rgba(99,102,241,0.5);
+  background: rgba(99,102,241,0.05);
+}
+
+.ref-image-item {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.ref-image-item:hover {
+  transform: scale(1.05);
+  z-index: 10;
+}
+
+/* Lightbox overlay for reference image zoom */
+.lightbox-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(12px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-out;
+  animation: fadeIn 0.2s ease;
+}
+
+.lightbox-overlay img {
+  max-width: 85vw;
+  max-height: 85vh;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  object-fit: contain;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 20px; right: 24px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.lightbox-close:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+.lightbox-zone-label {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+}
+
+.lightbox-zone-btn {
+  padding: 8px 20px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: Pretendard;
+  transition: all 0.2s;
+}
+
+.lightbox-zone-btn:hover {
+  background: rgba(99,102,241,0.3);
+  border-color: #6366f1;
+}
+
+.lightbox-zone-btn.danger {
+  background: rgba(248,113,113,0.15);
+  border-color: rgba(248,113,113,0.3);
+  color: #fca5a5;
+}
+
+.lightbox-zone-btn.danger:hover {
+  background: rgba(248,113,113,0.3);
+}
+
+.ref-image-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ref-image-item .img-delete {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(0,0,0,0.7);
+  border: none;
+  color: #fff;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+/* Delete button shown via JS 0.6s hover timer, not pure CSS hover */
+
+.ref-image-item.selected-ref {
+  border: 2px solid #a5b4fc;
+}
+
+.ref-zone-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b6b80;
+  font-size: 13px;
+  text-align: center;
+  padding: 20px;
+}
+
+/* Design Image with Selection */
+.design-result-img {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.3s;
+}
+
+.design-result-img:hover {
+  border-color: rgba(99,102,241,0.3);
+}
+
+.design-result-img.selected {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 20px rgba(139,92,246,0.4);
+}
+
+.design-result-img img {
+  width: 100%;
+  display: block;
+}
+
+/* Modal Color Picker */
+.color-picker-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.color-input-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.color-input-row input[type="color"] {
+  width: 60px;
+  height: 60px;
+  padding: 4px;
+  cursor: pointer;
+}
+
+.color-input-row input[type="text"] {
+  flex: 1;
+}
+
+/* Design Style Selection (改善) */
+.design-styles-picker {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.design-style-option {
+  padding: 12px;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.02);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  font-size: 13px;
+}
+
+.design-style-option:hover {
+  background: rgba(255,255,255,0.06);
+}
+
+.design-style-option.selected {
+  background: rgba(99,102,241,0.15);
+  border-color: #6366f1;
+  color: #a5b4fc;
+}
+
+/* Product Cards */
+.product-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.product-card:hover {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(99,102,241,0.3);
+}
+
+.product-card.active {
+  background: rgba(99,102,241,0.1);
+  border-color: #6366f1;
+}
+
+.product-card-thumb {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.04);
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+
+.product-card-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-card-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #e8e8f0;
+  margin-bottom: 4px;
+}
+
+.product-card-stage {
+  font-size: 11px;
+  color: #8888a0;
+}
+
+/* USP Chat */
+.usp-chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 500px;
+  gap: 12px;
+}
+
+.usp-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(255,255,255,0.015);
+  border-radius: 8px;
+}
+
+.usp-message {
+  display: flex;
+  gap: 8px;
+  animation: fadeIn 0.3s ease;
+}
+
+.usp-message.user {
+  justify-content: flex-end;
+}
+
+.usp-message.ai {
+  justify-content: flex-start;
+}
+
+.usp-message-content {
+  max-width: 70%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.usp-message.user .usp-message-content {
+  background: linear-gradient(135deg, rgba(99,102,241,0.3), rgba(139,92,246,0.3));
+  border: 1px solid rgba(99,102,241,0.2);
+  color: #e8e8f0;
+}
+
+.usp-message.ai .usp-message-content {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #b0b0c0;
+}
+
+.usp-input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.usp-input-row input {
+  flex: 1;
+}
+
+.usp-input-row button {
+  padding: 10px 16px;
+}
+
+/* Detail Page Wireframe */
+.wireframe {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wf-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.wf-block {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 6px;
+  padding: 8px;
+  font-size: 12px;
+  color: #8888a0;
+  display: flex;
+  align-items: center;
+}
+
+.copy-result {
+  display: flex;
+  flex-direction: column;
+}
+
+.copy-section {
+  padding: 12px 0;
+}
+
+.copy-section h4 {
+  font-size: 13px;
+  font-weight: 600;
+  color: #a5b4fc;
+  margin-bottom: 6px;
+}
+
+.copy-section p {
+  font-size: 13px;
+  color: #b0b0c0;
+  line-height: 1.6;
+  margin-bottom: 4px;
+}
+
+/* AI Tools Grid */
+.ai-tools-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.ai-tool-card {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.ai-tool-card:hover {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(99,102,241,0.3);
+}
+
+.ai-tool-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.ai-tool-info h4 {
+  font-size: 13px;
+  font-weight: 600;
+  color: #e8e8f0;
+  margin-bottom: 2px;
+}
+
+.ai-tool-info p {
+  font-size: 12px;
+  color: #8888a0;
+}
+
+/* Linked Banner */
+.linked-banner {
+  background: rgba(99,102,241,0.08);
+  border: 1px solid rgba(99,102,241,0.2);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.linked-banner-thumb {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.04);
+}
+
+.linked-banner-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.linked-banner-info {
+  flex: 1;
+  font-size: 13px;
+  color: #b0b0c0;
+}
+
+.linked-banner-info strong {
+  color: #a5b4fc;
+}
+
+/* Editable Fields */
+.editable-field {
+  position: relative;
+}
+
+.editable-trigger {
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.editable-trigger:hover {
+  background: rgba(99,102,241,0.1);
+}
+
+.editable-input-wrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  background: #16161f;
+  border: 2px solid #6366f1;
+  border-radius: 8px;
+  padding: 12px;
+  min-width: 300px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+/* Chip Editor */
+.chip-editor {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.chip-edit-item {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.chip-edit-item .chip {
+  margin: 0;
+}
+
+.chip-edit-item .remove-chip {
+  cursor: pointer;
+  font-size: 12px;
+  color: #f87171;
+  padding: 0 4px;
+}
+
+/* Prompt Preview */
+.prompt-preview {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 12px;
+  color: #8888a0;
+  line-height: 1.5;
+  font-family: 'Courier New', monospace;
+  max-height: 150px;
+  overflow-y: auto;
+  margin-bottom: 12px;
+  position: relative;
+}
+
+.copy-prompt-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 4px 8px;
+  font-size: 11px;
+  background: rgba(99,102,241,0.2);
+  border: 1px solid rgba(99,102,241,0.3);
+  color: #a5b4fc;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.copy-prompt-btn:hover {
+  background: rgba(99,102,241,0.3);
+}
+
+/* Design Style Tabs */
+.design-style-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.design-style-tab {
+  padding: 8px 16px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.02);
+  color: #8888a0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.design-style-tab.active {
+  background: rgba(99,102,241,0.2);
+  border-color: #6366f1;
+  color: #a5b4fc;
+}
+
+.design-style-tab:hover:not(.active) {
+  background: rgba(255,255,255,0.06);
+}
+
+/* Generated Designs */
+.generated-designs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.design-item {
+  position: relative;
+}
+
+.design-result-img {
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.3s;
+}
+
+.design-result-img:hover {
+  border-color: rgba(99,102,241,0.5);
+}
+
+.design-result-img.selected {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 20px rgba(139,92,246,0.4);
+}
+
+.design-result-img img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.design-select-btn {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  padding: 8px;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.design-item:hover .design-select-btn {
+  opacity: 1;
+}
+
+/* Reference Floating (legacy) */
+.ref-float-area {
+  position: relative;
+  min-height: 200px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(255,255,255,0.015);
+  border-radius: 10px;
+  border: 1px dashed rgba(255,255,255,0.08);
+}
+
+.ref-float-empty {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #6b6b80;
+  font-size: 13px;
+}
+
+.ref-loading-dots {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.ref-loading-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #6366f1;
+  animation: bounce 1.4s infinite;
+}
+
+.ref-loading-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.ref-loading-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes bounce {
+  0%, 80%, 100% { opacity: 0.3; }
+  40% { opacity: 1; }
+}
+
+@keyframes floatIn {
+  from { opacity: 0; transform: scale(0.3) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes gentleFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.ref-bubble {
+  position: absolute;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid rgba(255,255,255,0.1);
+  transition: all 0.2s;
+}
+
+.ref-bubble:hover {
+  border-color: rgba(99,102,241,0.5);
+  box-shadow: 0 8px 24px rgba(99,102,241,0.2);
+}
+
+.ref-bubble img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pexels-credit {
+  font-size: 11px;
+  color: #6b6b80;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.pexels-credit a {
+  color: #a5b4fc;
+  text-decoration: none;
+}
+
+.pexels-credit a:hover {
+  text-decoration: underline;
+}
+
+/* Form Section */
+.form-section {
+  margin-bottom: 24px;
+}
+
+.form-section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #e8e8f0;
+  margin-bottom: 12px;
+}
+
+.btn-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.btn-group button {
+  flex: 1;
+  min-width: 120px;
+}
+
+select {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: #e8e8f0;
+  font-family: Pretendard;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+select option {
+  background: #16161f;
+  color: #e8e8f0;
+}
+</style>
+</head>
+<body>
+
+<div class="bg-orbs">
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+  <div class="bg-orb bg-orb-3"></div>
+  <div class="bg-orb bg-orb-4"></div>
+  <div class="bg-orb bg-orb-5"></div>
+</div>
+
+<canvas class="noise-overlay"></canvas>
+
+<div class="app-container">
+  <div class="header">
+    <h1>pdbox</h1>
+    <div style="display:flex;gap:6px;align-items:center">
+      <button class="settings-btn" onclick="exportPDF()" title="PDF 저장">📄</button>
+      <button class="settings-btn" onclick="exportImages()" title="이미지 저장">🖼️</button>
+      <button class="settings-btn" onclick="exportToGoogleSheets()" title="Google Sheets">📊</button>
+      <button class="settings-btn" onclick="openFigma()" title="Figma">🎨</button>
+      <button class="settings-btn" onclick="openApiKeyModal()">⚙️</button>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="plan" onclick="switchTab(&#39;plan&#39;)">📋 기획</button>
+    <button class="tab-btn" data-tab="usp" onclick="switchTab(&#39;usp&#39;)">🎯 USP 도출</button>
+    <button class="tab-btn" data-tab="detail" onclick="switchTab(&#39;detail&#39;)">📄 상세페이지 구조</button>
+    <button class="tab-btn" data-tab="status" onclick="switchTab(&#39;status&#39;)">📊 진행현황</button>
+  </div>
+
+  <!-- TAB 1: AI 트렌드 기획 -->
+  <div id="tab-plan" class="tab-content active">
+    <div class="glass-card">
+      <div class="section-label">📋 상품 기획 옵션</div>
+      <div class="form-section">
+        <div class="form-section-title">제품 형태</div>
+        <div class="tag-group" id="formTags"><span class="tag " onclick="toggleTag(&#39;form&#39;,&#39;앰플&#39;)">앰플</span><span class="tag " onclick="toggleTag(&#39;form&#39;,&#39;세럼&#39;)">세럼</span><span class="tag " onclick="toggleTag(&#39;form&#39;,&#39;크림&#39;)">크림</span><span class="tag " onclick="toggleTag(&#39;form&#39;,&#39;토너&#39;)">토너</span><span class="tag " onclick="toggleTag(&#39;form&#39;,&#39;에센스&#39;)">에센스</span><span class="tag " onclick="toggleTag(&#39;form&#39;,&#39;오일&#39;)">오일</span><span class="tag " onclick="toggleTag(&#39;form&#39;,&#39;클렌저&#39;)">클렌저</span><span class="tag " onclick="toggleTag(&#39;form&#39;,&#39;패드&#39;)">패드</span><span class="tag selected" onclick="toggleTag(&#39;form&#39;,&#39;연고크림&#39;)">연고크림<span class="remove-custom" onclick="event.stopPropagation();removeCustomTag(&#39;form&#39;,&#39;연고크림&#39;)">✕</span></span><span class="tag add-custom-tag" onclick="toggleCustomInput(&#39;form&#39;)">+ 기타</span></div>
+        <div class="custom-input-wrap open" id="formCustomWrap">
+          <input type="text" id="formCustomInput" placeholder="새로운 제품 형태 입력" onkeypress="if(event.key===&#39;Enter&#39;) addCustomTag(&#39;form&#39;)">
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">타겟 고객층</div>
+        <div class="tag-group" id="targetTags"><span class="tag " onclick="toggleTag(&#39;target&#39;,&#39;20대 여성&#39;)">20대 여성</span><span class="tag " onclick="toggleTag(&#39;target&#39;,&#39;30대 여성&#39;)">30대 여성</span><span class="tag " onclick="toggleTag(&#39;target&#39;,&#39;40대 여성&#39;)">40대 여성</span><span class="tag " onclick="toggleTag(&#39;target&#39;,&#39;민감성 피부&#39;)">민감성 피부</span><span class="tag " onclick="toggleTag(&#39;target&#39;,&#39;지성 피부&#39;)">지성 피부</span><span class="tag " onclick="toggleTag(&#39;target&#39;,&#39;건성 피부&#39;)">건성 피부</span><span class="tag " onclick="toggleTag(&#39;target&#39;,&#39;남성&#39;)">남성</span><span class="tag selected" onclick="toggleTag(&#39;target&#39;,&#39;5세미만 아기&#39;)">5세미만 아기<span class="remove-custom" onclick="event.stopPropagation();removeCustomTag(&#39;target&#39;,&#39;5세미만 아기&#39;)">✕</span></span><span class="tag add-custom-tag" onclick="toggleCustomInput(&#39;target&#39;)">+ 기타</span></div>
+        <div class="custom-input-wrap open" id="targetCustomWrap">
+          <input type="text" id="targetCustomInput" placeholder="새로운 타겟층 입력" onkeypress="if(event.key===&#39;Enter&#39;) addCustomTag(&#39;target&#39;)">
+        </div>
+      </div>
+
+      <div class="form-col">
+        <label>핵심 컨셉/방향 (선택)</label>
+        <textarea id="planConcept" placeholder="예: 피부 톤 보정, 해독, 항산화 등"></textarea>
+      </div>
+
+      <div class="form-col">
+        <label>원하는 성분/효과 (선택)</label>
+        <textarea id="planIngredients" placeholder="예: 나이아신아마이드, 히알루론산, 펩타이드 등"></textarea>
+      </div>
+
+      <div class="form-col">
+        <label>레퍼런스 제품 URL (선택)</label>
+        <input type="url" id="planRefs" placeholder="https://example.com/product">
+      </div>
+
+      <div class="form-col">
+        <label>추가 요구사항 (선택)</label>
+        <textarea id="planExtra" placeholder="예: 환경친화적 용기, 향료 프리, 미니 사이즈 등"></textarea>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn-primary" id="planStartBtn" onclick="startPlan()">AI 제품 기획 시작하기</button>
+        <button class="btn-secondary" onclick="savePlanToHistory()">💾 기획 저장</button>
+        <button class="btn-secondary" onclick="openPlanHistory()">📂 최근 기획</button>
+      </div>
+    </div>
+
+    <div id="planResult" style="display: block;">
+    <div class="glass-card concept-box fade-in">
+      <div class="highlight-purple">
+        <h3 id="inlineProductName" contenteditable="true" spellcheck="false" onblur="inlineSave(&#39;productName&#39;, this.textContent)">베베덤 어성초 카밍 스팟밤</h3>
+        <p id="inlineConcept" contenteditable="true" spellcheck="false" style="outline:none" onblur="inlineSave(&#39;concept&#39;, this.textContent)">신생아부터 사용 가능한 초순한 성분 설계로, 밤사이 아기 피부의 오돌토돌·울긋불긋 트러블을 집중 진정시키는 야간 스팟케어 크림입니다. 약모밀(어성초) 추출물과 고함량 판테놀 5%의 시너지로 자극 없이 강력한 진정·재생 효과를 하룻밤 사이에 선사합니다. 아기가 잠든 사이, 피부 본연의 건강한 결을 되찾아주는 스마트 나이트 스팟 솔루션입니다.</p>
+      </div>
+    </div>
+    <div class="glass-card fade-in">
+      <div class="section-label">✏️ 클릭하여 바로 수정</div>
+      <div class="form-col">
+        <label>제품명</label>
+        <input type="text" value="베베덤 어성초 카밍 스팟밤" onchange="inlineSave(&#39;productName&#39;, this.value)" style="font-size:16px;font-weight:600">
+      </div>
+      <div class="form-col">
+        <label>컨셉</label>
+        <textarea onchange="inlineSave(&#39;concept&#39;, this.value)" style="min-height:60px">신생아부터 사용 가능한 초순한 성분 설계로, 밤사이 아기 피부의 오돌토돌·울긋불긋 트러블을 집중 진정시키는 야간 스팟케어 크림입니다. 약모밀(어성초) 추출물과 고함량 판테놀 5%의 시너지로 자극 없이 강력한 진정·재생 효과를 하룻밤 사이에 선사합니다. 아기가 잠든 사이, 피부 본연의 건강한 결을 되찾아주는 스마트 나이트 스팟 솔루션입니다.</textarea>
+      </div>
+      <div class="form-col">
+        <label>컬러 추천</label>
+        <div class="color-row">
+          <div class="color-item">
+            <input type="color" value="#F8F6F2" onchange="inlineSaveColor(0, this.value)" style="width:50px;height:50px;padding:2px;cursor:pointer;border-radius:10px">
+            <div style="display:flex;flex-direction:column;gap:2px">
+              <input type="text" value="순백 크림화이트" onchange="inlineSaveColorName(0, this.value)" style="width:100px;padding:4px 8px;font-size:12px;font-weight:600">
+              <span class="muted" style="font-size:11px;padding-left:8px" id="colorHexLabel0">#F8F6F2</span>
+            </div>
+          </div><div class="color-item">
+            <input type="color" value="#C8DDD1" onchange="inlineSaveColor(1, this.value)" style="width:50px;height:50px;padding:2px;cursor:pointer;border-radius:10px">
+            <div style="display:flex;flex-direction:column;gap:2px">
+              <input type="text" value="세이지 민트그린" onchange="inlineSaveColorName(1, this.value)" style="width:100px;padding:4px 8px;font-size:12px;font-weight:600">
+              <span class="muted" style="font-size:11px;padding-left:8px" id="colorHexLabel1">#C8DDD1</span>
+            </div>
+          </div><div class="color-item">
+            <input type="color" value="#F5D9C8" onchange="inlineSaveColor(2, this.value)" style="width:50px;height:50px;padding:2px;cursor:pointer;border-radius:10px">
+            <div style="display:flex;flex-direction:column;gap:2px">
+              <input type="text" value="베이비 피치베이지" onchange="inlineSaveColorName(2, this.value)" style="width:100px;padding:4px 8px;font-size:12px;font-weight:600">
+              <span class="muted" style="font-size:11px;padding-left:8px" id="colorHexLabel2">#F5D9C8</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-col">
+          <label>용기 형태</label>
+          <input type="text" value="위생적인 라미네이트 알루미늄 튜브 + 스크류캡(좁은 노즐 구조로 소량 정밀 도포 가능, 스팟 전용 설계) / 튜브 외관은 부드러운 무광 화이트 베이스에 민트그린 포인트 컬러, 아기 피부 일러스트 엠보 인쇄 적용" onchange="inlineSave(&#39;container&#39;, this.value)">
+        </div>
+        <div class="form-col">
+          <label>추천 용량</label>
+          <input type="text" value="30ml 튜브 / 스팟크림 특성상 소량씩 트러블 부위에만 점적 도포하는 제품으로, 30ml는 약 2~3개월 사용 가능한 최적 용량이며 신선도 유지와 휴대·보관 편의성을 동시에 충족합니다." onchange="inlineSave(&#39;volume&#39;, this.value)">
+        </div>
+      </div>
+      <div class="form-col">
+        <label>핵심 성분</label>
+        <textarea onchange="inlineSave(&#39;ingredients&#39;, this.value)" style="min-height:60px">핵심 이원(二元) 진정 시스템: ① 약모밀(어성초, Houttuynia Cordata) 추출물 — 천연 항균·항염 성분으로 트러블 원인균 억제 및 붉음증 완화, 오돌토돌 피부 결 정돈 / ② 판테놀(Panthenol) 5% 고함량 — 손상된 피부 장벽 즉각 복구, 수분 보습막 형성, 자극받은 피부 진정 및 재생 촉진 / 보조 성분: 마데카소사이드(병풀 유도체, 흉터·트러블 자국 완화), 알란토인(추가 진정·세포 재생), 스쿠알란(신생아 피부 친화성 보습), 글리세린(수분 유지), 비즈왁스(밤 타입 밀착 피막 형성으로 야간 집중 케어) / 무향·무색소·무파라벤·무알코올·무미네랄오일 설계, 저자극 피부과 테스트 완료 기준</textarea>
+      </div>
+      <div class="form-col">
+        <label>차별화 특징</label>
+        <div class="chip-editor" id="featuresEditor">
+          <div class="chip-edit-item">
+              <input type="text" value="신생아(0세)부터 사용 가능한 초저자극 성분 배합 — 유해 성분 제로(Zero) 설계, 피부과·소아과 전문의 임상 테스트 완료" onchange="inlineSaveFeature(0, this.value)" class="chip chip-positioning" style="width:auto;min-width:80px;padding:4px 12px;font-size:12px;text-align:center;background:transparent">
+              <span class="remove-chip" onclick="removeFeature(0)">✕</span>
+            </div><div class="chip-edit-item">
+              <input type="text" value="판테놀 5% 고함량 + 약모밀 추출물 이중 진정 포뮬라 — 울긋불긋 염증성 트러블·오돌토돌 발진을 하룻밤 사이 집중 케어" onchange="inlineSaveFeature(1, this.value)" class="chip chip-feature" style="width:auto;min-width:80px;padding:4px 12px;font-size:12px;text-align:center;background:transparent">
+              <span class="remove-chip" onclick="removeFeature(1)">✕</span>
+            </div><div class="chip-edit-item">
+              <input type="text" value="스팟 전용 좁은 노즐 튜브 설계 — 트러블 부위에만 소량 정밀 도포, 위생적이고 경제적인 사용 가능" onchange="inlineSaveFeature(2, this.value)" class="chip chip-target" style="width:auto;min-width:80px;padding:4px 12px;font-size:12px;text-align:center;background:transparent">
+              <span class="remove-chip" onclick="removeFeature(2)">✕</span>
+            </div><div class="chip-edit-item">
+              <input type="text" value="야간 밀착 바이오 필름 형성 — 비즈왁스 기반 연고크림 제형이 수면 중 피부에 밀착되어 유효 성분의 흡수율과 지속력을 극대화" onchange="inlineSaveFeature(3, this.value)" class="chip chip-advantage" style="width:auto;min-width:80px;padding:4px 12px;font-size:12px;text-align:center;background:transparent">
+              <span class="remove-chip" onclick="removeFeature(3)">✕</span>
+            </div><div class="chip-edit-item">
+              <input type="text" value="마데카소사이드 + 알란토인 트러블 자국 케어 — 진정 후 남는 붉은 자국·색소침착까지 동시 관리하여 깨끗한 아기 피부 회복 지원" onchange="inlineSaveFeature(4, this.value)" class="chip chip-positioning" style="width:auto;min-width:80px;padding:4px 12px;font-size:12px;text-align:center;background:transparent">
+              <span class="remove-chip" onclick="removeFeature(4)">✕</span>
+            </div>
+          <button class="btn-secondary btn-sm" onclick="addFeature()">+ 추가</button>
+        </div>
+      </div>
+      <div class="form-col">
+        <label>시장 포지셔닝</label>
+        <textarea onchange="inlineSave(&#39;positioning&#39;, this.value)" style="min-height:60px">국내 영유아 스킨케어 시장에서 '신생아 전용 야간 트러블 스팟크림'이라는 명확한 카테고리를 선점합니다. 기존 베이비 크림이 전체 보습에 집중했다면, 본 제품은 '트러블 스팟 집중 타겟팅'이라는 차별화 포인트로 트러블성 피부를 가진 영유아 자녀를 둔 2030 부모(특히 민감한 첫째 아이 부모)를 핵심 타겟으로 합니다. 프리미엄 더마 베이비 카테고리 내 가격대(18,000~25,000원)로 포지셔닝하여, 아토팜·세타필 베이비 등 기존 강자와 차별화된 '야간 스팟케어 전문 베이비 더마 브랜드' 이미지를 구축합니다. 온라인 육아 커뮤니티(맘카페, 인스타그램 육아 인플루언서) 중심 바이럴 마케팅과 소아과 클리닉 샘플링 전략을 병행합니다.</textarea>
+      </div>
+      <button class="btn-primary" style="margin-top:16px" onclick="applyEdits()">전체 탭에 적용</button>
+    </div>
+
+    <!-- 레퍼런스 이미지 영역 (두 개 존) -->
+    <div class="glass-card fade-in" style="margin-top:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div class="section-label" style="margin-bottom:0">🖼️ 레퍼런스 이미지</div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <input type="text" id="refSearchInput" placeholder="구글 이미지 검색..." style="width:200px;padding:6px 12px;font-size:12px" oncompositionstart="window._imeRef=true" oncompositionend="window._imeRef=false" onkeydown="if(event.key===&#39;Enter&#39;&amp;&amp;!window._imeRef) openGoogleImageSearch()">
+          <button class="btn-secondary btn-sm" onclick="openGoogleImageSearch()" style="white-space:nowrap">🔍 구글 이미지</button>
+        </div>
+      </div>
+      <p class="muted" style="margin-bottom:10px;font-size:12px">구글에서 이미지를 찾아 여기로 드래그 | 이미지 클릭 → AI 참고 ↔ 일반 이동 | 우클릭 → 출처</p>
+      <div class="ref-image-zone">
+        <div>
+          <label class="ref-zone-title">일반 레퍼런스 <span style="font-weight:400;color:#6b6b80;text-transform:none;letter-spacing:0;font-size:11px">클릭 → AI 참고로 이동</span></label>
+          <div class="ref-zone-panel">
+            <div class="ref-float-area" id="refGeneralGrid" ondrop="handleRefImageDrop(event,&#39;general&#39;)" ondragover="handleDragOver(event,&#39;general&#39;)" ondragleave="handleDragLeave(event,&#39;general&#39;)" style="min-height:280px"><div class="ref-image-item" data-zone="general" data-source="https://www.pexels.com/photo/luxury-skincare-product-with-gold-lid-29611441/" style="position: absolute; width: 99.3158px; height: 99.3158px; aspect-ratio: 1 / 1; border-radius: 12px; top: 36.5448%; left: 5.30943%; transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); animation: 0.5s ease-out 0s 1 normal both running floatIn; z-index: 4;"><img src="./pdbox_files/pexels-photo-29611441.jpeg" draggable="false"><button class="img-delete">✕</button></div><div class="ref-image-item" data-zone="general" data-source="https://www.pexels.com/photo/lavender-soothing-cream-jar-in-soft-lighting-29652922/" style="position: absolute; width: 106.263px; height: 106.263px; aspect-ratio: 1 / 1; border-radius: 12px; top: 49.4%; left: 21.1404%; transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); animation: 0.5s ease-out 0.08s 1 normal both running floatIn; z-index: 4;"><img src="./pdbox_files/pexels-photo-29652922.jpeg" draggable="false"><button class="img-delete">✕</button></div><div class="ref-image-item" data-zone="general" data-source="https://www.pexels.com/photo/close-up-shot-of-a-face-cream-11464366/" style="position: absolute; width: 93.2677px; height: 93.2677px; aspect-ratio: 1 / 1; border-radius: 12px; top: 8.8091%; left: 34.0389%; transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); animation: 0.5s ease-out 0.16s 1 normal both running floatIn; z-index: 3;"><img src="./pdbox_files/pexels-photo-11464366.jpeg" draggable="false"><button class="img-delete">✕</button></div><div class="ref-image-item" data-zone="general" data-source="https://www.pexels.com/photo/luxurious-keida-facial-cream-black-jar-on-white-29611442/" style="position: absolute; width: 112.93px; height: 112.93px; aspect-ratio: 1 / 1; border-radius: 12px; top: 22.5653%; left: 51.281%; transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); animation: 0.5s ease-out 0.24s 1 normal both running floatIn; z-index: 4;"><img src="./pdbox_files/pexels-photo-29611442.jpeg" draggable="false"><button class="img-delete">✕</button></div><div class="ref-image-item" data-zone="general" data-source="https://www.pexels.com/photo/close-up-of-a-tube-with-a-face-cream-13779257/" style="position: absolute; width: 79.0678px; height: 79.0678px; aspect-ratio: 1 / 1; border-radius: 12px; top: 15.0136%; left: 64.4691%; transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); animation: 0.5s ease-out 0.32s 1 normal both running floatIn; z-index: 0;"><img src="./pdbox_files/pexels-photo-13779257.jpeg" draggable="false"><button class="img-delete">✕</button></div><div class="ref-image-item" data-zone="general" data-source="https://www.pexels.com/photo/a-beauty-product-on-the-table-13794471/" style="position: absolute; width: 118.689px; height: 118.689px; aspect-ratio: 1 / 1; border-radius: 12px; top: 15.3858%; left: 79.3324%; transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); animation: 0.5s ease-out 0.4s 1 normal both running floatIn; z-index: 3;"><img src="./pdbox_files/pexels-photo-13794471.jpeg" draggable="false"><button class="img-delete">✕</button></div><div class="ref-image-item" data-zone="general" data-source="https://www.pexels.com/photo/luxurious-skincare-products-on-white-background-29611529/" style="position: absolute; width: 91.2728px; height: 91.2728px; aspect-ratio: 1 / 1; border-radius: 12px; top: 38.3228%; left: 6.94142%; transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); animation: 0.5s ease-out 0.48s 1 normal both running floatIn; z-index: 3;"><img src="./pdbox_files/pexels-photo-29611529.jpeg" draggable="false"><button class="img-delete">✕</button></div><div class="ref-image-item" data-zone="general" data-source="https://www.pexels.com/photo/cosmetic-tube-with-clouds-behind-16378477/" style="position: absolute; width: 92.1685px; height: 92.1685px; aspect-ratio: 1 / 1; border-radius: 12px; top: 62.4156%; left: 18.9612%; transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); animation: 0.5s ease-out 0.56s 1 normal both running floatIn; z-index: 0;"><img src="./pdbox_files/pexels-photo-16378477.jpeg" draggable="false"><button class="img-delete">✕</button></div><div class="ref-image-item" data-zone="general" data-source="https://www.pexels.com/photo/cosmetic-products-on-the-table-6167451/" style="position: absolute; width: 103.438px; height: 103.438px; aspect-ratio: 1 / 1; border-radius: 12px; top: 20.6989%; left: 34.2736%; transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); animation: 0.5s ease-out 0.64s 1 normal both running floatIn; z-index: 0;"><img src="./pdbox_files/pexels-photo-6167451.jpeg" draggable="false"><button class="img-delete">✕</button></div><div class="ref-image-item" data-zone="general" data-source="https://www.pexels.com/photo/cosmetic-products-on-the-table-7317009/" style="position: absolute; width: 110.7px; height: 110.7px; aspect-ratio: 1 / 1; border-radius: 12px; top: 64.0574%; left: 48.1759%; transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); animation: 0.5s ease-out 0.72s 1 normal both running floatIn; z-index: 3;"><img src="./pdbox_files/pexels-photo-7317009.jpeg" draggable="false"><button class="img-delete">✕</button></div><div class="ref-image-item" data-zone="general" data-source="https://www.pexels.com/photo/close-up-photo-of-a-white-paste-on-a-white-surface-7780352/" style="position: absolute; width: 95.102px; height: 95.102px; aspect-ratio: 1 / 1; border-radius: 12px; top: 39.9425%; left: 63.122%; transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); animation: 0.5s ease-out 0.8s 1 normal both running floatIn; z-index: 2;"><img src="./pdbox_files/pexels-photo-7780352.jpeg" draggable="false"><button class="img-delete">✕</button></div><div class="ref-image-item" data-zone="general" data-source="https://www.pexels.com/photo/close-up-of-cosmetics-7670680/" style="position: absolute; width: 104.091px; height: 104.091px; aspect-ratio: 1 / 1; border-radius: 12px; top: 18.3877%; left: 81.986%; transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); animation: 0.5s ease-out 0.88s 1 normal both running floatIn; z-index: 4;"><img src="./pdbox_files/pexels-photo-7670680.jpeg" draggable="false"><button class="img-delete">✕</button></div></div>
+          </div>
+        </div>
+        <div>
+          <label class="ref-zone-title">AI 참고 레퍼런스 <span style="font-weight:400;color:#6b6b80;text-transform:none;letter-spacing:0;font-size:11px">클릭하면 일반으로 이동</span></label>
+          <div class="ref-zone-panel">
+            <div class="ref-images-grid" id="refAiGrid" ondrop="handleRefImageDrop(event,&#39;ai&#39;)" ondragover="handleDragOver(event,&#39;ai&#39;)" ondragleave="handleDragLeave(event,&#39;ai&#39;)" style="min-height:280px">
+              <div class="ref-zone-empty">디자인 참고 이미지를 여기로</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI 디자인 컨셉 생성 -->
+    <div class="glass-card fade-in" style="margin-top:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div class="section-label" style="margin-bottom:0">🎨 AI 디자인 컨셉 (3가지 스타일)</div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <select id="engineSelect" onchange="switchEngine(this.value)" style="padding:6px 10px;font-size:12px;border-radius:8px">
+            <option value="nano">🍌 나노바나나</option>
+            <option value="dalle">🖼️ DALL-E</option>
+          </select>
+          <span class="muted" style="font-size:11px" id="designKeyStatus">✅</span>
+        </div>
+      </div>
+      <p class="muted" style="margin-bottom:12px" id="engineDesc">기획 완료 시 자동으로 3가지 컨셉 이미지가 생성됩니다. 클릭하여 선택하세요.</p>
+      <div id="designStyleLabels" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"><span class="chip chip-positioning">달빛 아래 포근한 잠자리 느낌</span><span class="chip chip-feature">깨끗한 소아과 처방전 느낌</span><span class="chip chip-target">아기 피부가 꽃처럼 되살아나는 느낌</span></div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <button class="btn-primary" id="designGenBtn" onclick="generateDesigns()">🍌 3가지 디자인 생성</button>
+        <button class="btn-secondary btn-sm" onclick="generateDesignSingle(event)">1장만 빠르게</button>
+      </div>
+      <div id="designResults" class="generated-designs" style="margin-top:16px"></div>
+    </div>
+
+    <!-- AI 디자인 도구 바로가기 -->
+    <div class="glass-card fade-in">
+      <div class="section-label">🛠️ AI 디자인 &amp; 패키징 도구</div>
+      <div style="font-size:13px;font-weight:600;color:#a5b4fc;margin-bottom:10px">📦 패키징 전문 도구</div>
+      <div class="ai-tools-grid" style="margin-bottom:20px">
+        <a class="ai-tool-card" href="https://www.packify.ai/" target="_blank" rel="noopener">
+          <div class="ai-tool-icon" style="background:linear-gradient(135deg,#10b981,#34d399)">📦</div>
+          <div class="ai-tool-info">
+            <h4>Packify.ai</h4>
+            <p>AI 패키징 에이전트</p>
+          </div>
+        </a>
+        <a class="ai-tool-card" href="https://www.pacdora.com/" target="_blank" rel="noopener">
+          <div class="ai-tool-icon" style="background:linear-gradient(135deg,#06b6d4,#0ea5e9)">🎁</div>
+          <div class="ai-tool-info">
+            <h4>Pacdora</h4>
+            <p>3D 패키지 목업</p>
+          </div>
+        </a>
+      </div>
+      <div style="font-size:13px;font-weight:600;color:#a5b4fc;margin-bottom:10px">🎨 디자인 도구</div>
+      <div class="ai-tools-grid">
+        <a class="ai-tool-card" href="https://www.figma.com/" target="_blank" rel="noopener">
+          <div class="ai-tool-icon" style="background:linear-gradient(135deg,#a259ff,#f24e1e)">🎨</div>
+          <div class="ai-tool-info"><h4>Figma</h4><p>디자인 협업 툴</p></div>
+        </a>
+        <a class="ai-tool-card" href="https://www.midjourney.com/" target="_blank" rel="noopener">
+          <div class="ai-tool-icon" style="background:linear-gradient(135deg,#1a1a2e,#16213e)">🌌</div>
+          <div class="ai-tool-info"><h4>Midjourney</h4><p>AI 이미지 생성</p></div>
+        </a>
+        <a class="ai-tool-card" href="https://ideogram.ai/" target="_blank" rel="noopener">
+          <div class="ai-tool-icon" style="background:linear-gradient(135deg,#4f46e5,#7c3aed)">✨</div>
+          <div class="ai-tool-info"><h4>Ideogram</h4><p>AI 이미지 생성</p></div>
+        </a>
+        <a class="ai-tool-card" href="https://leonardo.ai/" target="_blank" rel="noopener">
+          <div class="ai-tool-icon" style="background:linear-gradient(135deg,#8b5cf6,#ec4899)">🦁</div>
+          <div class="ai-tool-info"><h4>Leonardo.ai</h4><p>AI 이미지 생성</p></div>
+        </a>
+      </div>
+      <div style="font-size:13px;font-weight:600;color:#a5b4fc;margin-bottom:10px;margin-top:16px">📤 내보내기</div>
+      <div class="ai-tools-grid">
+        <div class="ai-tool-card" onclick="exportPDF()" style="cursor:pointer">
+          <div class="ai-tool-icon" style="background:linear-gradient(135deg,#ef4444,#f87171)">📄</div>
+          <div class="ai-tool-info"><h4>PDF 저장</h4><p>기획서 PDF 다운로드</p></div>
+        </div>
+        <div class="ai-tool-card" onclick="exportImages()" style="cursor:pointer">
+          <div class="ai-tool-icon" style="background:linear-gradient(135deg,#06b6d4,#34d399)">🖼️</div>
+          <div class="ai-tool-info"><h4>이미지 저장</h4><p>디자인 이미지 다운로드</p></div>
+        </div>
+        <div class="ai-tool-card" onclick="exportToGoogleSheets()" style="cursor:pointer">
+          <div class="ai-tool-icon" style="background:linear-gradient(135deg,#34a853,#4285f4)">📊</div>
+          <div class="ai-tool-info"><h4>Google Sheets</h4><p>기획 데이터 공유</p></div>
+        </div>
+        <div class="ai-tool-card" onclick="openFigma()" style="cursor:pointer">
+          <div class="ai-tool-icon" style="background:linear-gradient(135deg,#a259ff,#f24e1e)">🎨</div>
+          <div class="ai-tool-info"><h4>Figma로 보내기</h4><p>디자인 시안 작업</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- TAB 2: USP 도출 -->
+  <div id="tab-usp" class="tab-content">
+    <div id="uspLinkedBanner" style="display:none"></div>
+    <div class="glass-card">
+      <div class="section-label">🎯 USP 도출 챗</div>
+      <div class="usp-chat-container">
+        <div class="usp-chat-messages" id="uspChatMessages"><div class="usp-message ai"><div class="usp-message-content">타겟 고객의 가장 큰 피부 고민은 무엇인가요?</div></div></div>
+        <div class="usp-input-row">
+          <input type="text" id="uspInput" placeholder="답변을 입력하세요..." oncompositionstart="window._imeComposing=true" oncompositionend="window._imeComposing=false" onkeydown="if(event.key===&#39;Enter&#39;&amp;&amp;!window._imeComposing) submitUspAnswer()" style="padding:10px 14px">
+          <button class="btn-primary" onclick="submitUspAnswer()">전송</button>
+        </div>
+      </div>
+    </div>
+    <div id="uspResult" style="display:none"></div>
+  </div>
+
+  <!-- TAB 3: 상세페이지 구조 -->
+  <div id="tab-detail" class="tab-content">
+    <div id="detailLinkedBanner" style="display: block;">
+    <div class="linked-banner">
+      
+      <div class="linked-banner-info">
+        <strong>어시아티카 블랑 약모밀 집중 앰플 (Asiatica Blanc Houttuynia Ampoule)</strong><br>
+        USP: 아직 도출되지 않음
+      </div>
+    </div>
+  </div>
+    <div class="glass-card">
+      <div class="section-label">📄 상세페이지 구조 생성</div>
+      <div class="form-col">
+        <label>추가 요구사항 (선택)</label>
+        <textarea id="detailExtra" placeholder="예: 감정적 스토리텔링, 과학적 데이터 강조 등"></textarea>
+      </div>
+      <div class="form-col">
+        <label>레퍼런스 URL (선택)</label>
+        <input type="url" id="detailRef" placeholder="https://example.com/product">
+      </div>
+      <button class="btn-primary" id="detailGenBtn" onclick="generateDetailStructure()" style="margin-top:12px">3가지 스타일 구조 생성 ↗</button>
+    </div>
+    <div id="detailResult" style="display:none"></div>
+  </div>
+
+  <!-- TAB 4: 진행현황 -->
+  <div id="tab-status" class="tab-content">
+    <div class="glass-card">
+      <div class="section-label">📊 진행현황 추적</div>
+      <div class="form-col">
+        <button class="btn-primary" onclick="openAddProductModal()">+ 새 상품 추가</button>
+      </div>
+      <div id="productsList" class="grid-3" style="margin-top:16px"><p style="grid-column:span 3;text-align:center;color:#6b6b80">아직 추가된 상품이 없습니다</p></div>
+    </div>
+    <div id="productDetail" style="display:none;margin-top:16px"></div>
+  </div>
+
+</div>
+
+<div id="toastContainer" class="toast-container"></div>
+
+<script>
+// ==================== GLOBALS ====================
+let globalPlanData = null;
+let globalUspData = null;
+let products = [];
+let selectedProductId = null;
+let uspStep = 0;
+let uspAnswers = [];
+
+const FORM_TYPES = ['앰플', '세럼', '크림', '토너', '에센스', '오일', '클렌저', '패드'];
+const TARGET_TYPES = ['20대 여성', '30대 여성', '40대 여성', '민감성 피부', '지성 피부', '건성 피부', '남성'];
+const STAGES = ['기획', '디자인', '제조사 선정', '샘플', '양산'];
+const USP_QUESTIONS = [
+  "타겟 고객의 가장 큰 피부 고민은 무엇인가요?",
+  "경쟁사 대비 이 제품의 차별점은 무엇인가요?",
+  "고객이 사용 후 느끼길 바라는 한 가지 변화는 무엇인가요?"
+];
+
+let selectedForms = [];
+let selectedTargets = [];
+let customForms = [];
+let customTargets = [];
+let currentDesignEngine = 'nano';
+
+// ==================== INIT ====================
+document.addEventListener('DOMContentLoaded', () => {
+  loadData();
+  renderFormTags();
+  renderTargetTags();
+  renderProducts();
+  initUspChat();
+  renderDetailLinkedBanner();
+
+  if (!localStorage.getItem('ccfm_claude_key')) {
+    openApiKeyModal();
+  }
+});
+
+function loadData() {
+  try {
+    products = JSON.parse(localStorage.getItem('ccfm_products') || '[]');
+    globalPlanData = JSON.parse(localStorage.getItem('ccfm_plan_data') || 'null');
+    globalUspData = JSON.parse(localStorage.getItem('ccfm_usp_data') || 'null');
+  } catch(e) { products = []; }
+}
+
+function saveData() {
+  localStorage.setItem('ccfm_products', JSON.stringify(products));
+  if (globalPlanData) localStorage.setItem('ccfm_plan_data', JSON.stringify(globalPlanData));
+  if (globalUspData) localStorage.setItem('ccfm_usp_data', JSON.stringify(globalUspData));
+}
+
+// ==================== TOAST ====================
+function showToast(msg, type='info') {
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = `toast toast-${type}`;
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity 0.3s'; setTimeout(() => t.remove(), 300); }, 3000);
+}
+
+// ==================== MODAL ====================
+function openApiKeyModal() {
+  closeModal();
+  const existingClaude = localStorage.getItem('ccfm_claude_key') || '';
+  const existingGemini = localStorage.getItem('ccfm_gemini_key') || '';
+  const existingOpenai = localStorage.getItem('ccfm_openai_key') || '';
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.id = 'modalOverlay';
+  overlay.innerHTML = `<div class="modal" style="max-width:520px">
+    <h2>🔑 API 키 설정</h2>
+    <p>AI 기능을 사용하기 위한 API 키를 입력하세요.<br>키는 브라우저 localStorage에만 저장됩니다.</p>
+    <label style="margin-top:12px">Claude API 키 <span style="color:#6b6b80;font-weight:400">(기획·USP·상세페이지)</span></label>
+    <input type="text" id="apiKeyInput" placeholder="sk-ant-api03-..." value="${existingClaude}" style="font-size:13px">
+    <label style="margin-top:16px">Google AI API 키 <span style="color:#34d399;font-weight:600">(나노바나나 — 기본 디자인 엔진)</span></label>
+    <input type="text" id="geminiKeyInput" placeholder="AIzaSy..." value="${existingGemini}" style="font-size:13px">
+    <p style="font-size:12px;color:#6b6b80;margin-top:4px;margin-bottom:0"><a href="https://aistudio.google.com/apikey" target="_blank" style="color:#a5b4fc">Google AI Studio</a>에서 무료 발급 가능합니다.</p>
+    <label style="margin-top:16px">Pexels API 키 <span style="color:#6b6b80;font-weight:400">(레퍼런스 이미지 검색)</span></label>
+    <input type="text" id="pexelsKeyInput" placeholder="Pexels API Key..." value="${localStorage.getItem('ccfm_pexels_key')||''}" style="font-size:13px">
+    <p style="font-size:12px;color:#6b6b80;margin-top:4px;margin-bottom:0"><a href="https://www.pexels.com/api/new/" target="_blank" style="color:#a5b4fc">Pexels.com/api</a>에서 무료 발급 (월 200회)</p>
+    <label style="margin-top:16px">OpenAI API 키 <span style="color:#6b6b80;font-weight:400">(DALL-E 보조 엔진, 선택)</span></label>
+    <input type="text" id="openaiKeyInput" placeholder="sk-proj-..." value="${existingOpenai}" style="font-size:13px">
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="closeModal()">취소</button>
+      <button class="btn-primary" onclick="saveApiKey()">저장</button>
+    </div>
+  </div>`;
+  document.body.appendChild(overlay);
+}
+
+function saveApiKey() {
+  const k = document.getElementById('apiKeyInput').value.trim();
+  const gk = document.getElementById('geminiKeyInput').value.trim();
+  const pk = document.getElementById('pexelsKeyInput').value.trim();
+  const ok = document.getElementById('openaiKeyInput').value.trim();
+  if (!k) { showToast('Claude API 키를 입력해주세요', 'warning'); return; }
+  localStorage.setItem('ccfm_claude_key', k);
+  if (gk) localStorage.setItem('ccfm_gemini_key', gk);
+  if (pk) localStorage.setItem('ccfm_pexels_key', pk);
+  if (ok) localStorage.setItem('ccfm_openai_key', ok);
+  closeModal();
+  showToast('API 키가 저장되었습니다', 'success');
+}
+
+function getGeminiKey() {
+  return localStorage.getItem('ccfm_gemini_key') || null;
+}
+
+function getOpenaiKey() {
+  return localStorage.getItem('ccfm_openai_key') || null;
+}
+
+function getPexelsKey() {
+  return localStorage.getItem('ccfm_pexels_key') || null;
+}
+
+function closeModal() {
+  const m = document.getElementById('modalOverlay');
+  if (m) m.remove();
+}
+
+function getApiKey() {
+  const k = localStorage.getItem('ccfm_claude_key');
+  if (!k) { openApiKeyModal(); return null; }
+  return k;
+}
+
+// ==================== TABS ====================
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  if (tab === 'usp') renderUspLinkedBanner();
+  if (tab === 'detail') renderDetailLinkedBanner();
+  if (tab === 'status') renderProducts();
+}
+
+// ==================== TAGS ====================
+function renderFormTags() {
+  const c = document.getElementById('formTags');
+  const all = [...FORM_TYPES, ...customForms];
+  c.innerHTML = all.map(t => `<span class="tag ${selectedForms.includes(t)?'selected':''}" onclick="toggleTag('form','${t}')">${t}${customForms.includes(t)?`<span class="remove-custom" onclick="event.stopPropagation();removeCustomTag('form','${t}')">✕</span>`:''}</span>`).join('') +
+    `<span class="tag add-custom-tag" onclick="toggleCustomInput('form')">+ 기타</span>`;
+}
+
+function renderTargetTags() {
+  const c = document.getElementById('targetTags');
+  const all = [...TARGET_TYPES, ...customTargets];
+  c.innerHTML = all.map(t => `<span class="tag ${selectedTargets.includes(t)?'selected':''}" onclick="toggleTag('target','${t}')">${t}${customTargets.includes(t)?`<span class="remove-custom" onclick="event.stopPropagation();removeCustomTag('target','${t}')">✕</span>`:''}</span>`).join('') +
+    `<span class="tag add-custom-tag" onclick="toggleCustomInput('target')">+ 기타</span>`;
+}
+
+function toggleTag(type, val) {
+  const arr = type === 'form' ? selectedForms : selectedTargets;
+  const idx = arr.indexOf(val);
+  if (idx >= 0) arr.splice(idx, 1); else arr.push(val);
+  type === 'form' ? renderFormTags() : renderTargetTags();
+}
+
+function toggleCustomInput(type) {
+  document.getElementById(type + 'CustomWrap').classList.toggle('open');
+  document.getElementById(type + 'CustomInput').focus();
+}
+
+function addCustomTag(type) {
+  const inp = document.getElementById(type + 'CustomInput');
+  const val = inp.value.trim();
+  if (!val) return;
+  if (type === 'form') { customForms.push(val); selectedForms.push(val); renderFormTags(); }
+  else { customTargets.push(val); selectedTargets.push(val); renderTargetTags(); }
+  inp.value = '';
+}
+
+function removeCustomTag(type, val) {
+  if (type === 'form') { customForms = customForms.filter(v => v !== val); selectedForms = selectedForms.filter(v => v !== val); renderFormTags(); }
+  else { customTargets = customTargets.filter(v => v !== val); selectedTargets = selectedTargets.filter(v => v !== val); renderTargetTags(); }
+}
+
+// ==================== CLAUDE API ====================
+async function callClaude(systemPrompt, userPrompt) {
+  const key = getApiKey();
+  if (!key) throw new Error('API 키가 없습니다');
+  const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 4096,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userPrompt }]
+    })
+  });
+  if (!resp.ok) {
+    const err = await resp.text();
+    throw new Error(`API 오류 (${resp.status}): ${err}`);
+  }
+  const data = await resp.json();
+  return data.content[0].text;
+}
+
+// ==================== TAB 1: AI 트렌드 기획 ====================
+async function startPlan() {
+  const btn = document.getElementById('planStartBtn');
+  if (selectedForms.length === 0) { showToast('제품 형태를 선택해주세요', 'warning'); return; }
+  if (selectedTargets.length === 0) { showToast('타겟 고객을 선택해주세요', 'warning'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>AI가 기획 중입니다...';
+
+  const concept = document.getElementById('planConcept').value;
+  const ingredients = document.getElementById('planIngredients').value;
+  const refs = document.getElementById('planRefs').value;
+  const extra = document.getElementById('planExtra').value;
+
+  const systemPrompt = `당신은 K-뷰티 상품 기획 전문가입니다. 사용자의 요구에 맞춰 혁신적이고 트렌디한 화장품 제품을 기획합니다. 반드시 아래 JSON 형식으로만 응답하세요. JSON 외의 텍스트는 절대 포함하지 마세요.
+
+응답 형식:
+{
+  "productName": "제품명",
+  "concept": "AI 기획 컨셉 (2~3문장)",
+  "colors": ["컬러명1","컬러명2","컬러명3"],
+  "colorHex": ["#hex1","#hex2","#hex3"],
+  "container": "용기 형태 추천",
+  "volume": "추천 용량 및 이유",
+  "ingredients": "핵심 성분 조합 설명",
+  "features": ["특징1","특징2","특징3","특징4","특징5"],
+  "positioning": "시장 포지셔닝 설명"
+}`;
+
+  const userPrompt = `다음 조건으로 화장품 제품을 기획해주세요:
+
+- 제품 형태: ${selectedForms.join(', ')}
+- 타겟 고객: ${selectedTargets.join(', ')}
+- 핵심 컨셉/방향: ${concept || '자유롭게 제안'}
+- 원하는 성분/효과: ${ingredients || '자유롭게 제안'}
+- 레퍼런스 제품 URL: ${refs || '없음'}
+- 추가 요구사항: ${extra || '없음'}
+
+위 조건을 바탕으로 트렌디하고 차별화된 제품을 기획해주세요.`;
+
+  try {
+    const raw = await callClaude(systemPrompt, userPrompt);
+    const jsonStr = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const result = JSON.parse(jsonStr);
+    globalPlanData = {
+      ...result,
+      forms: [...selectedForms],
+      targets: [...selectedTargets],
+      refImages: [],
+      aiRefImages: [],
+      selectedDesign: null,
+      designStyles: []
+    };
+    saveData();
+    renderPlanResult(result);
+    showToast('AI 기획이 완료되었습니다! 디자인 컨셉 자동 생성을 시작합니다...', 'success');
+    // Chain: style options → auto-generate designs
+    setTimeout(async () => {
+      await renderDesignStyleOptions();
+      if (getGeminiKey() || getOpenaiKey()) {
+        setTimeout(() => generateDesigns(), 1000);
+      }
+    }, 500);
+  } catch (e) {
+    showToast('오류: ' + e.message, 'error');
+    console.error(e);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = 'AI 제품 기획 시작하기';
+  }
+}
+
+function renderPlanResult(r) {
+  const el = document.getElementById('planResult');
+  el.style.display = 'block';
+  el.innerHTML = `
+    <div class="glass-card concept-box fade-in">
+      <div class="highlight-purple">
+        <h3 id="inlineProductName" contenteditable="true" spellcheck="false" onblur="inlineSave('productName', this.textContent)">${r.productName}</h3>
+        <p id="inlineConcept" contenteditable="true" spellcheck="false" style="outline:none" onblur="inlineSave('concept', this.textContent)">${r.concept}</p>
+      </div>
+    </div>
+    <div class="glass-card fade-in">
+      <div class="section-label">✏️ 클릭하여 바로 수정</div>
+      <div class="form-col">
+        <label>제품명</label>
+        <input type="text" value="${r.productName}" onchange="inlineSave('productName', this.value)" style="font-size:16px;font-weight:600">
+      </div>
+      <div class="form-col">
+        <label>컨셉</label>
+        <textarea onchange="inlineSave('concept', this.value)" style="min-height:60px">${r.concept}</textarea>
+      </div>
+      <div class="form-col">
+        <label>컬러 추천</label>
+        <div class="color-row">
+          ${r.colors.map((c, i) => `<div class="color-item">
+            <input type="color" value="${r.colorHex[i]}" onchange="inlineSaveColor(${i}, this.value)" style="width:50px;height:50px;padding:2px;cursor:pointer;border-radius:10px">
+            <div style="display:flex;flex-direction:column;gap:2px">
+              <input type="text" value="${c}" onchange="inlineSaveColorName(${i}, this.value)" style="width:100px;padding:4px 8px;font-size:12px;font-weight:600">
+              <span class="muted" style="font-size:11px;padding-left:8px" id="colorHexLabel${i}">${r.colorHex[i]}</span>
+            </div>
+          </div>`).join('')}
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-col">
+          <label>용기 형태</label>
+          <input type="text" value="${r.container}" onchange="inlineSave('container', this.value)">
+        </div>
+        <div class="form-col">
+          <label>추천 용량</label>
+          <input type="text" value="${r.volume}" onchange="inlineSave('volume', this.value)">
+        </div>
+      </div>
+      <div class="form-col">
+        <label>핵심 성분</label>
+        <textarea onchange="inlineSave('ingredients', this.value)" style="min-height:60px">${r.ingredients}</textarea>
+      </div>
+      <div class="form-col">
+        <label>차별화 특징</label>
+        <div class="chip-editor" id="featuresEditor">
+          ${r.features.map((f, i) => {
+            const cls = ['chip-positioning','chip-feature','chip-target','chip-advantage','chip-positioning'][i % 5];
+            return `<div class="chip-edit-item">
+              <input type="text" value="${f}" onchange="inlineSaveFeature(${i}, this.value)" class="chip ${cls}" style="width:auto;min-width:80px;padding:4px 12px;font-size:12px;text-align:center;background:transparent">
+              <span class="remove-chip" onclick="removeFeature(${i})">✕</span>
+            </div>`;
+          }).join('')}
+          <button class="btn-secondary btn-sm" onclick="addFeature()">+ 추가</button>
+        </div>
+      </div>
+      <div class="form-col">
+        <label>시장 포지셔닝</label>
+        <textarea onchange="inlineSave('positioning', this.value)" style="min-height:60px">${r.positioning}</textarea>
+      </div>
+      <button class="btn-primary" style="margin-top:16px" onclick="applyEdits()">전체 탭에 적용</button>
+    </div>
+
+    <!-- 레퍼런스 이미지 영역 (두 개 존) -->
+    <div class="glass-card fade-in" style="margin-top:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div class="section-label" style="margin-bottom:0">🖼️ 레퍼런스 이미지</div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <input type="text" id="refSearchInput" placeholder="구글 이미지 검색..." style="width:200px;padding:6px 12px;font-size:12px"
+            oncompositionstart="window._imeRef=true" oncompositionend="window._imeRef=false"
+            onkeydown="if(event.key==='Enter'&&!window._imeRef) openGoogleImageSearch()">
+          <button class="btn-secondary btn-sm" onclick="openGoogleImageSearch()" style="white-space:nowrap">🔍 구글 이미지</button>
+        </div>
+      </div>
+      <p class="muted" style="margin-bottom:10px;font-size:12px">구글에서 이미지를 찾아 여기로 드래그 | 이미지 클릭 → AI 참고 ↔ 일반 이동 | 우클릭 → 출처</p>
+      <div class="ref-image-zone">
+        <div>
+          <label class="ref-zone-title">일반 레퍼런스 <span style="font-weight:400;color:#6b6b80;text-transform:none;letter-spacing:0;font-size:11px">클릭 → AI 참고로 이동</span></label>
+          <div class="ref-zone-panel">
+            <div class="ref-float-area" id="refGeneralGrid" ondrop="handleRefImageDrop(event,'general')" ondragover="handleDragOver(event,'general')" ondragleave="handleDragLeave(event,'general')" style="min-height:280px">
+              <div class="ref-zone-empty" id="refGeneralEmpty" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">AI가 이미지를 검색 중...</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <label class="ref-zone-title">AI 참고 레퍼런스 <span style="font-weight:400;color:#6b6b80;text-transform:none;letter-spacing:0;font-size:11px">클릭하면 일반으로 이동</span></label>
+          <div class="ref-zone-panel">
+            <div class="ref-images-grid" id="refAiGrid" ondrop="handleRefImageDrop(event,'ai')" ondragover="handleDragOver(event,'ai')" ondragleave="handleDragLeave(event,'ai')" style="min-height:280px">
+              <div class="ref-zone-empty">디자인 참고 이미지를 여기로</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI 디자인 컨셉 생성 -->
+    <div class="glass-card fade-in" style="margin-top:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div class="section-label" style="margin-bottom:0">🎨 AI 디자인 컨셉 (3가지 스타일)</div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <select id="engineSelect" onchange="switchEngine(this.value)" style="padding:6px 10px;font-size:12px;border-radius:8px">
+            <option value="nano">🍌 나노바나나</option>
+            <option value="dalle">🖼️ DALL-E</option>
+          </select>
+          <span class="muted" style="font-size:11px" id="designKeyStatus">${getGeminiKey() ? '✅' : '⚠️ 키 필요'}</span>
+        </div>
+      </div>
+      <p class="muted" style="margin-bottom:12px" id="engineDesc">기획 완료 시 자동으로 3가지 컨셉 이미지가 생성됩니다. 클릭하여 선택하세요.</p>
+      <div id="designStyleLabels" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"></div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <button class="btn-primary" id="designGenBtn" onclick="generateDesigns()">🍌 3가지 컨셉 이미지 생성</button>
+        <button class="btn-secondary btn-sm" onclick="generateDesignSingle(event)">1장만 빠르게</button>
+      </div>
+      <div id="designResults" class="generated-designs" style="margin-top:16px"></div>
+    </div>
+
+    <!-- AI 디자인 도구 바로가기 -->
+    <div class="glass-card fade-in">
+      <div class="section-label">🛠️ AI 디자인 & 패키징 도구</div>
+      <div style="font-size:13px;font-weight:600;color:#a5b4fc;margin-bottom:10px">📦 패키징 전문 도구</div>
+      <div class="ai-tools-grid" style="margin-bottom:20px">
+        <a class="ai-tool-card" href="https://www.packify.ai" target="_blank" rel="noopener">
+          <div class="ai-tool-icon" style="background:linear-gradient(135deg,#10b981,#34d399)">📦</div>
+          <div class="ai-tool-info">
+            <h4>Packify.ai</h4>
+            <p>AI 패키징 에이전트</p>
+          </div>
+        </a>
+        <a class="ai-tool-card" href="https://www.pacdora.com" target="_blank" rel="noopener">
+          <div class="ai-tool-icon" style="background:linear-gradient(135deg,#06b6d4,#0ea5e9)">🎁</div>
+          <div class="ai-tool-info">
+            <h4>Pacdora</h4>
+            <p>3D 패키지 목업</p>
+          </div>
+        </a>
+      </div>
+      <div style="font-size:13px;font-weight:600;color:#a5b4fc;margin-bottom:10px">🎨 디자인 도구</div>
+      <div class="ai-tools-grid">
+        <a class="ai-tool-card" href="https://www.figma.com" target="_blank" rel="noopener">
+          <div class="ai-tool-icon" style="background:linear-gradient(135deg,#a259ff,#f24e1e)">🎨</div>
+          <div class="ai-tool-info"><h4>Figma</h4><p>디자인 협업 툴</p></div>
+        </a>
+        <a class="ai-tool-card" href="https://www.midjourney.com" target="_blank" rel="noopener">
+          <div class="ai-tool-icon" style="background:linear-gradient(135deg,#1a1a2e,#16213e)">🌌</div>
+          <div class="ai-tool-info"><h4>Midjourney</h4><p>AI 이미지 생성</p></div>
+        </a>
+        <a class="ai-tool-card" href="https://ideogram.ai" target="_blank" rel="noopener">
+          <div class="ai-tool-icon" style="background:linear-gradient(135deg,#4f46e5,#7c3aed)">✨</div>
+          <div class="ai-tool-info"><h4>Ideogram</h4><p>AI 이미지 생성</p></div>
+        </a>
+        <a class="ai-tool-card" href="https://leonardo.ai" target="_blank" rel="noopener">
+          <div class="ai-tool-icon" style="background:linear-gradient(135deg,#8b5cf6,#ec4899)">🦁</div>
+          <div class="ai-tool-info"><h4>Leonardo.ai</h4><p>AI 이미지 생성</p></div>
+        </a>
+      </div>
+      <div style="font-size:13px;font-weight:600;color:#a5b4fc;margin-bottom:10px;margin-top:16px">📤 내보내기</div>
+      <div class="ai-tools-grid">
+        <div class="ai-tool-card" onclick="exportPDF()" style="cursor:pointer">
+          <div class="ai-tool-icon" style="background:linear-gradient(135deg,#ef4444,#f87171)">📄</div>
+          <div class="ai-tool-info"><h4>PDF 저장</h4><p>기획서 PDF 다운로드</p></div>
+        </div>
+        <div class="ai-tool-card" onclick="exportImages()" style="cursor:pointer">
+          <div class="ai-tool-icon" style="background:linear-gradient(135deg,#06b6d4,#34d399)">🖼️</div>
+          <div class="ai-tool-info"><h4>이미지 저장</h4><p>디자인 이미지 다운로드</p></div>
+        </div>
+        <div class="ai-tool-card" onclick="exportToGoogleSheets()" style="cursor:pointer">
+          <div class="ai-tool-icon" style="background:linear-gradient(135deg,#34a853,#4285f4)">📊</div>
+          <div class="ai-tool-info"><h4>Google Sheets</h4><p>기획 데이터 공유</p></div>
+        </div>
+        <div class="ai-tool-card" onclick="openFigma()" style="cursor:pointer">
+          <div class="ai-tool-icon" style="background:linear-gradient(135deg,#a259ff,#f24e1e)">🎨</div>
+          <div class="ai-tool-info"><h4>Figma로 보내기</h4><p>디자인 시안 작업</p></div>
+        </div>
+      </div>
+    </div>
+  `;
+  renderDesignStyleOptions();
+  renderRefImages();
+  autoSearchRefImages();
+}
+
+// ==================== INLINE EDITING ====================
+function inlineSave(field, value) {
+  if (!globalPlanData) return;
+  const v = value.trim();
+  if (v && globalPlanData[field] !== v) {
+    globalPlanData[field] = v;
+    saveData();
+  }
+}
+
+function inlineSaveColor(idx, hex) {
+  if (!globalPlanData) return;
+  globalPlanData.colorHex[idx] = hex;
+  const label = document.getElementById('colorHexLabel' + idx);
+  if (label) label.textContent = hex;
+  saveData();
+}
+
+function inlineSaveColorName(idx, name) {
+  if (!globalPlanData) return;
+  globalPlanData.colors[idx] = name.trim();
+  saveData();
+}
+
+function inlineSaveFeature(idx, value) {
+  if (!globalPlanData) return;
+  globalPlanData.features[idx] = value.trim();
+  saveData();
+}
+
+function removeFeature(idx) {
+  globalPlanData.features.splice(idx, 1);
+  saveData();
+  renderPlanResult(globalPlanData);
+}
+
+function addFeature() {
+  if (!globalPlanData) return;
+  globalPlanData.features.push('새 특징');
+  saveData();
+  renderPlanResult(globalPlanData);
+}
+
+function applyEdits() {
+  saveData();
+  showToast('전체 탭에 수정사항이 적용되었습니다', 'success');
+  renderDetailLinkedBanner();
+  renderUspLinkedBanner();
+}
+
+// ==================== PLAN SAVE / LOAD HISTORY ====================
+function savePlanToHistory() {
+  if (!globalPlanData) { showToast('저장할 기획이 없습니다', 'warning'); return; }
+  const history = JSON.parse(localStorage.getItem('ccfm_plan_history') || '[]');
+  const entry = {
+    id: Date.now(),
+    name: globalPlanData.productName || '이름 없음',
+    date: new Date().toLocaleString('ko-KR'),
+    data: JSON.parse(JSON.stringify(globalPlanData))
+  };
+  history.unshift(entry);
+  if (history.length > 20) history.length = 20;
+  localStorage.setItem('ccfm_plan_history', JSON.stringify(history));
+  showToast(`"${entry.name}" 기획이 저장되었습니다`, 'success');
+}
+
+function openPlanHistory() {
+  closeModal();
+  const history = JSON.parse(localStorage.getItem('ccfm_plan_history') || '[]');
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.id = 'modalOverlay';
+
+  const listHtml = history.length === 0
+    ? '<p style="text-align:center;color:#6b6b80;padding:20px">저장된 기획이 없습니다</p>'
+    : history.map(h => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:8px;margin-bottom:8px;cursor:pointer;transition:all 0.2s" onmouseenter="this.style.borderColor='rgba(99,102,241,0.4)'" onmouseleave="this.style.borderColor='rgba(255,255,255,0.06)'">
+        <div onclick="loadPlanFromHistory(${h.id})" style="flex:1">
+          <div style="font-size:14px;font-weight:600;color:#e8e8f0">${h.name}</div>
+          <div style="font-size:12px;color:#6b6b80;margin-top:2px">${h.date}</div>
+        </div>
+        <button class="btn-secondary btn-sm" style="margin-left:8px;padding:4px 10px;font-size:11px;color:#f87171;border-color:rgba(248,113,113,0.2)" onclick="event.stopPropagation();deletePlanHistory(${h.id})">삭제</button>
+      </div>
+    `).join('');
+
+  overlay.innerHTML = `<div class="modal" style="max-width:480px;max-height:80vh;overflow-y:auto">
+    <h2>📂 최근 기획</h2>
+    <p>저장된 기획을 클릭하여 불러옵니다.</p>
+    ${listHtml}
+    <div class="btn-row" style="margin-top:16px">
+      <button class="btn-secondary" onclick="closeModal()">닫기</button>
+    </div>
+  </div>`;
+  document.body.appendChild(overlay);
+}
+
+function loadPlanFromHistory(id) {
+  const history = JSON.parse(localStorage.getItem('ccfm_plan_history') || '[]');
+  const entry = history.find(h => h.id === id);
+  if (!entry) return;
+  globalPlanData = JSON.parse(JSON.stringify(entry.data));
+  saveData();
+  renderPlanResult(globalPlanData);
+  closeModal();
+  showToast(`"${entry.name}" 기획을 불러왔습니다`, 'success');
+}
+
+function deletePlanHistory(id) {
+  let history = JSON.parse(localStorage.getItem('ccfm_plan_history') || '[]');
+  history = history.filter(h => h.id !== id);
+  localStorage.setItem('ccfm_plan_history', JSON.stringify(history));
+  openPlanHistory();
+  showToast('삭제되었습니다', 'info');
+}
+
+// ==================== GOOGLE IMAGE SEARCH ====================
+function openGoogleImageSearch() {
+  const input = document.getElementById('refSearchInput');
+  let q = input ? input.value.trim() : '';
+  if (!q && globalPlanData) {
+    q = globalPlanData.productName + ' 화장품 패키지 디자인';
+  }
+  if (!q) { showToast('검색어를 입력하세요', 'warning'); return; }
+
+  // Open Google Images in a sized popup window
+  const w = Math.min(1200, screen.width - 100);
+  const h = Math.min(800, screen.height - 100);
+  const left = (screen.width - w) / 2;
+  const top = (screen.height - h) / 2;
+  window.open(
+    'https://www.google.com/search?tbm=isch&q=' + encodeURIComponent(q),
+    'googleImageSearch',
+    `width=${w},height=${h},left=${left},top=${top},resizable=yes,scrollbars=yes`
+  );
+  showToast('구글 이미지에서 원하는 사진을 이 칸으로 드래그하세요!', 'info');
+}
+
+// ==================== EXPORT: PDF ====================
+function exportPDF() {
+  if (!globalPlanData) { showToast('먼저 기획을 완료해주세요', 'warning'); return; }
+  const r = globalPlanData;
+
+  const printWin = window.open('', '_blank');
+  printWin.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <title>${r.productName} - pdbox 기획서</title>
+    <style>
+      body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 800px; margin: 0 auto; padding: 40px; color: #222; line-height: 1.7; }
+      h1 { font-size: 28px; border-bottom: 3px solid #6366f1; padding-bottom: 12px; color: #1a1a2e; }
+      h2 { font-size: 18px; color: #6366f1; margin-top: 32px; margin-bottom: 12px; }
+      .meta { font-size: 13px; color: #666; margin-bottom: 24px; }
+      table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+      th { background: #f1f0ff; text-align: left; padding: 10px 14px; font-size: 13px; color: #4338ca; border: 1px solid #e0e0e0; }
+      td { padding: 10px 14px; font-size: 14px; border: 1px solid #e0e0e0; }
+      .chip { display: inline-block; background: #f0f0ff; color: #4338ca; padding: 3px 10px; border-radius: 20px; font-size: 12px; margin: 2px; }
+      .color-block { display: inline-block; width: 24px; height: 24px; border-radius: 6px; vertical-align: middle; margin-right: 8px; border: 1px solid #ddd; }
+      .design-img { max-width: 250px; border-radius: 12px; margin: 8px; }
+      .footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid #eee; font-size: 12px; color: #999; }
+    </style>
+  </head><body>
+    <h1>${r.productName}</h1>
+    <div class="meta">pdbox 기획서 | ${new Date().toLocaleDateString('ko-KR')} | 제품 형태: ${(r.forms||[]).join(', ')} | 타겟: ${(r.targets||[]).join(', ')}</div>
+
+    <h2>컨셉</h2>
+    <p>${r.concept}</p>
+
+    <h2>제품 정보</h2>
+    <table>
+      <tr><th>용기 형태</th><td>${r.container}</td></tr>
+      <tr><th>추천 용량</th><td>${r.volume}</td></tr>
+      <tr><th>핵심 성분</th><td>${r.ingredients}</td></tr>
+      <tr><th>시장 포지셔닝</th><td>${r.positioning}</td></tr>
+    </table>
+
+    <h2>컬러</h2>
+    <p>${r.colors.map((c, i) => `<span class="color-block" style="background:${r.colorHex[i]}"></span>${c} (${r.colorHex[i]})`).join('&nbsp;&nbsp;&nbsp;')}</p>
+
+    <h2>차별화 특징</h2>
+    <p>${(r.features||[]).map(f => `<span class="chip">${f}</span>`).join(' ')}</p>
+
+    ${globalUspData ? `<h2>USP</h2><p><strong>${globalUspData.usp}</strong></p><p>${globalUspData.reasoning || ''}</p>` : ''}
+
+    ${r.selectedDesign ? `<h2>AI 디자인 컨셉</h2><img class="design-img" src="${r.selectedDesign}" alt="Design">` : ''}
+
+    <div class="footer">Generated by pdbox</div>
+  </body></html>`);
+  printWin.document.close();
+  setTimeout(() => { printWin.print(); }, 500);
+}
+
+// ==================== EXPORT: IMAGES ====================
+function exportImages() {
+  if (!globalPlanData) { showToast('먼저 기획을 완료해주세요', 'warning'); return; }
+
+  const designImgs = document.querySelectorAll('#designResults .design-result-img img');
+  if (designImgs.length === 0 && !globalPlanData.selectedDesign) {
+    showToast('저장할 디자인 이미지가 없습니다', 'warning');
+    return;
+  }
+
+  let count = 0;
+  designImgs.forEach((img, i) => {
+    const link = document.createElement('a');
+    link.download = `${globalPlanData.productName || 'design'}_${i + 1}.png`;
+    link.href = img.src;
+    // For base64 images, direct download works
+    if (img.src.startsWith('data:')) {
+      link.click();
+      count++;
+    } else {
+      // For URL images, fetch and convert to blob
+      fetch(img.src).then(r => r.blob()).then(blob => {
+        link.href = URL.createObjectURL(blob);
+        link.click();
+        URL.revokeObjectURL(link.href);
+        count++;
+      }).catch(() => {
+        // Fallback: open in new tab
+        window.open(img.src, '_blank');
+        count++;
+      });
+    }
+  });
+
+  showToast(`${designImgs.length}개 이미지 다운로드 시작`, 'success');
+}
+
+// ==================== EXPORT: GOOGLE SHEETS ====================
+function exportToGoogleSheets() {
+  if (!globalPlanData) { showToast('먼저 기획을 완료해주세요', 'warning'); return; }
+  const r = globalPlanData;
+
+  // Build CSV content
+  const rows = [
+    ['항목', '내용'],
+    ['제품명', r.productName],
+    ['컨셉', r.concept],
+    ['제품 형태', (r.forms||[]).join(', ')],
+    ['타겟 고객', (r.targets||[]).join(', ')],
+    ['컬러', r.colors.map((c, i) => `${c}(${r.colorHex[i]})`).join(', ')],
+    ['용기 형태', r.container],
+    ['추천 용량', r.volume],
+    ['핵심 성분', r.ingredients],
+    ['차별화 특징', (r.features||[]).join(', ')],
+    ['시장 포지셔닝', r.positioning],
+    ['USP', globalUspData?.usp || ''],
+    ['생성일', new Date().toLocaleDateString('ko-KR')]
+  ];
+
+  const csvContent = rows.map(row =>
+    row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')
+  ).join('\n');
+
+  // Download as CSV (importable to Google Sheets)
+  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `${r.productName || 'pdbox'}_기획서.csv`;
+  link.click();
+  URL.revokeObjectURL(link.href);
+
+  showToast('CSV 다운로드 완료! Google Sheets에서 "파일 > 가져오기"로 열 수 있습니다', 'success');
+
+  // Also offer to open Google Sheets directly
+  setTimeout(() => {
+    if (confirm('Google Sheets를 열어서 CSV를 가져오시겠습니까?')) {
+      window.open('https://sheets.google.com/create', '_blank');
+    }
+  }, 500);
+}
+
+// ==================== EXPORT: FIGMA ====================
+function openFigma() {
+  if (!globalPlanData) { showToast('먼저 기획을 완료해주세요', 'warning'); return; }
+  const r = globalPlanData;
+
+  // Copy design spec to clipboard for Figma paste
+  const spec = `📦 ${r.productName}
+━━━━━━━━━━━━━━━
+컨셉: ${r.concept}
+용기: ${r.container} | 용량: ${r.volume}
+컬러: ${r.colors.map((c, i) => `${c} ${r.colorHex[i]}`).join(' / ')}
+특징: ${(r.features||[]).join(' · ')}
+포지셔닝: ${r.positioning}
+${globalUspData ? `USP: ${globalUspData.usp}` : ''}`;
+
+  navigator.clipboard.writeText(spec).then(() => {
+    showToast('디자인 스펙이 클립보드에 복사되었습니다! Figma에 붙여넣기 하세요', 'success');
+  }).catch(() => {
+    showToast('클립보드 복사 실패 — 아래 내용을 직접 복사하세요', 'warning');
+  });
+
+  // Open Figma
+  window.open('https://www.figma.com/files/recents-and-sharing', '_blank');
+}
+
+// ==================== REFERENCE IMAGES ====================
+function autoSearchRefImages() {
+  const key = getPexelsKey();
+  if (!key || !globalPlanData) return;
+
+  const formMap = { '앰플': 'ampoule', '세럼': 'serum', '크림': 'cream', '토너': 'toner', '에센스': 'essence', '오일': 'face oil', '클렌저': 'cleanser', '패드': 'toner pad' };
+  const engForms = (globalPlanData.forms || []).map(f => formMap[f] || f).join(' ');
+
+  const queries = [
+    `luxury ${engForms} skincare packaging design`,
+    `korean beauty ${engForms} cosmetic bottle`,
+    `premium ${engForms} skincare product`
+  ];
+
+  const grid = document.getElementById('refGeneralGrid');
+  if (!grid) return;
+  grid.innerHTML = '<div class="ref-zone-empty" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)"><div class="ref-loading-dots"><span></span><span></span><span></span></div>AI가 레퍼런스를 찾고 있습니다...</div>';
+
+  const q = queries[Math.floor(Math.random() * queries.length)];
+  fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(q)}&per_page=12&orientation=portrait`, {
+    headers: { 'Authorization': key }
+  })
+  .then(r => r.json())
+  .then(data => {
+    const photos = data.photos || [];
+    grid.innerHTML = '';
+    if (photos.length === 0) {
+      grid.innerHTML = '<div class="ref-zone-empty" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">이미지를 찾지 못했습니다</div>';
+      return;
+    }
+    // Place as floating bubbles
+    photos.forEach((photo, idx) => {
+      const item = createRefImageItem(photo.src.large2x || photo.src.large || photo.src.medium, 'general', photo.url);
+      // Random floating positions
+      const size = 70 + Math.random() * 50;
+      item.style.cssText = `position:absolute; width:${size}px; height:${size}px; aspect-ratio:1; border-radius:12px; top:${8 + Math.random() * 60}%; left:${3 + (idx % 6) * 15 + Math.random() * 4}%; transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1); animation:floatIn 0.5s ${idx * 0.08}s both ease-out; z-index:${Math.floor(Math.random()*5)}`;
+      grid.appendChild(item);
+    });
+  })
+  .catch(e => {
+    grid.innerHTML = '<div class="ref-zone-empty" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">이미지 외부에서 드래그하여 추가</div>';
+  });
+}
+
+function handleDragOver(e, zone) {
+  e.preventDefault();
+  document.getElementById(`ref${zone.charAt(0).toUpperCase() + zone.slice(1)}Grid`).classList.add('dragover');
+}
+
+function handleDragLeave(e, zone) {
+  document.getElementById(`ref${zone.charAt(0).toUpperCase() + zone.slice(1)}Grid`).classList.remove('dragover');
+}
+
+function handleRefImageDrop(e, zone) {
+  e.preventDefault();
+  document.getElementById(`ref${zone.charAt(0).toUpperCase() + zone.slice(1)}Grid`).classList.remove('dragover');
+  const grid = document.getElementById(`ref${zone.charAt(0).toUpperCase() + zone.slice(1)}Grid`);
+  const removeEmpty = () => { const empty = grid.querySelector('.ref-zone-empty'); if (empty) empty.remove(); };
+
+  // Handle dropped files (from desktop)
+  const files = e.dataTransfer.files;
+  for (let file of files) {
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { removeEmpty(); grid.appendChild(createRefImageItem(ev.target.result, zone)); };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  // Handle dropped image URLs (from browser / Google Images)
+  if (files.length === 0) {
+    const html = e.dataTransfer.getData('text/html');
+    const urlText = e.dataTransfer.getData('text/uri-list') || e.dataTransfer.getData('text/plain');
+    let imgUrl = null;
+    if (html) {
+      const match = html.match(/<img[^>]+src=["']([^"']+)["']/i);
+      if (match) imgUrl = match[1];
+    }
+    if (!imgUrl && urlText && /\.(jpg|jpeg|png|gif|webp|svg)/i.test(urlText)) {
+      imgUrl = urlText.trim();
+    }
+    if (imgUrl) {
+      removeEmpty();
+      grid.appendChild(createRefImageItem(imgUrl, zone));
+      showToast('이미지가 추가되었습니다', 'success');
+    }
+  }
+}
+
+function moveRefImage(item, toZone) {
+  const fromZone = item.parentElement.id.includes('General') ? 'general' : 'ai';
+  if (fromZone === toZone) return;
+  document.getElementById(`ref${toZone.charAt(0).toUpperCase() + toZone.slice(1)}Grid`).appendChild(item);
+}
+
+function renderRefImages() {
+  if (!globalPlanData) return;
+  if (!globalPlanData.refImages) globalPlanData.refImages = [];
+  if (!globalPlanData.aiRefImages) globalPlanData.aiRefImages = [];
+}
+
+// ==================== LIGHTBOX ZOOM ====================
+function openLightbox(imgSrc, fromZone) {
+  closeLightbox();
+  const overlay = document.createElement('div');
+  overlay.className = 'lightbox-overlay';
+  overlay.id = 'lightboxOverlay';
+  overlay.onclick = (e) => { if (e.target === overlay) closeLightbox(); };
+
+  const targetZone = fromZone === 'general' ? 'ai' : 'general';
+  const targetLabel = fromZone === 'general' ? 'AI 참고로 이동' : '일반으로 이동';
+
+  overlay.innerHTML = `
+    <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+    <img src="${imgSrc}" alt="Preview">
+    <div class="lightbox-zone-label">
+      <button class="lightbox-zone-btn" onclick="lightboxMove('${targetZone}')">↔ ${targetLabel}</button>
+      <button class="lightbox-zone-btn danger" onclick="lightboxDelete()">🗑 삭제</button>
+    </div>
+  `;
+  overlay.dataset.imgSrc = imgSrc;
+  overlay.dataset.fromZone = fromZone;
+  document.body.appendChild(overlay);
+}
+
+function closeLightbox() {
+  const lb = document.getElementById('lightboxOverlay');
+  if (lb) lb.remove();
+}
+
+function lightboxMove(toZone) {
+  const lb = document.getElementById('lightboxOverlay');
+  if (!lb) return;
+  const src = lb.dataset.imgSrc;
+  const fromZone = lb.dataset.fromZone;
+
+  // Find and move the matching image item
+  const fromGridId = fromZone === 'general' ? 'refGeneralGrid' : 'refAiGrid';
+  const toGridId = toZone === 'general' ? 'refGeneralGrid' : 'refAiGrid';
+  const fromGrid = document.getElementById(fromGridId);
+  const toGrid = document.getElementById(toGridId);
+  if (fromGrid && toGrid) {
+    const items = fromGrid.querySelectorAll('.ref-image-item');
+    for (const item of items) {
+      const img = item.querySelector('img');
+      if (img && img.src === src) {
+        toGrid.appendChild(item);
+        break;
+      }
+    }
+  }
+  closeLightbox();
+  showToast(toZone === 'ai' ? 'AI 참고 레퍼런스로 이동' : '일반 레퍼런스로 이동', 'info');
+}
+
+function lightboxDelete() {
+  const lb = document.getElementById('lightboxOverlay');
+  if (!lb) return;
+  const src = lb.dataset.imgSrc;
+  const fromZone = lb.dataset.fromZone;
+  const gridId = fromZone === 'general' ? 'refGeneralGrid' : 'refAiGrid';
+  const grid = document.getElementById(gridId);
+  if (grid) {
+    const items = grid.querySelectorAll('.ref-image-item');
+    for (const item of items) {
+      const img = item.querySelector('img');
+      if (img && img.src === src) {
+        item.remove();
+        break;
+      }
+    }
+  }
+  closeLightbox();
+  showToast('이미지가 삭제되었습니다', 'info');
+}
+
+function createRefImageItem(imgSrc, zone, sourceUrl) {
+  const item = document.createElement('div');
+  item.className = 'ref-image-item';
+  item.dataset.zone = zone;
+  if (sourceUrl) item.dataset.source = sourceUrl;
+  else if (imgSrc.startsWith('http') && !imgSrc.startsWith('data:')) item.dataset.source = imgSrc;
+  const img = document.createElement('img');
+  img.src = imgSrc;
+  img.draggable = false;
+  item.appendChild(img);
+
+  const deleteBtn = document.createElement('button');
+  deleteBtn.className = 'img-delete';
+  deleteBtn.textContent = '✕';
+  deleteBtn.onclick = (e) => {
+    e.stopPropagation();
+    item.style.transform = 'scale(0)';
+    item.style.opacity = '0';
+    setTimeout(() => item.remove(), 300);
+  };
+  item.appendChild(deleteBtn);
+
+  // 0.6s hover → show delete X
+  let hoverTimer = null;
+  item.onmouseenter = () => {
+    hoverTimer = setTimeout(() => { deleteBtn.style.opacity = '1'; }, 600);
+  };
+  item.onmouseleave = () => {
+    clearTimeout(hoverTimer);
+    deleteBtn.style.opacity = '0';
+  };
+
+  // Right-click → source link context menu
+  item.oncontextmenu = (e) => {
+    e.preventDefault();
+    closeRefContextMenu();
+    const src = item.dataset.source;
+    const menu = document.createElement('div');
+    menu.id = 'refContextMenu';
+    menu.style.cssText = `position:fixed;top:${e.clientY}px;left:${e.clientX}px;z-index:9999;background:#1e1e2e;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:4px;box-shadow:0 8px 24px rgba(0,0,0,0.5);min-width:160px;animation:fadeIn 0.15s ease`;
+
+    if (src) {
+      menu.innerHTML += `<div style="padding:8px 12px;font-size:13px;color:#e8e8f0;cursor:pointer;border-radius:6px;transition:background 0.15s" onmouseenter="this.style.background='rgba(99,102,241,0.2)'" onmouseleave="this.style.background='transparent'" onclick="window.open('${src}','_blank');closeRefContextMenu()">🔗 출처 이미지 열기</div>`;
+    } else {
+      menu.innerHTML += `<div style="padding:8px 12px;font-size:13px;color:#6b6b80">출처 정보 없음</div>`;
+    }
+    menu.innerHTML += `<div style="padding:8px 12px;font-size:13px;color:#fca5a5;cursor:pointer;border-radius:6px;transition:background 0.15s" onmouseenter="this.style.background='rgba(248,113,113,0.15)'" onmouseleave="this.style.background='transparent'" onclick="this.parentElement.targetItem.remove();closeRefContextMenu()">🗑 삭제</div>`;
+    menu.targetItem = item;
+    document.body.appendChild(menu);
+    setTimeout(() => document.addEventListener('click', closeRefContextMenu, { once: true }), 50);
+  };
+
+  // Click → fly to opposite zone
+  item.onclick = () => {
+    const currentZone = item.dataset.zone;
+    const toZone = currentZone === 'general' ? 'ai' : 'general';
+    const toGridId = toZone === 'general' ? 'refGeneralGrid' : 'refAiGrid';
+    const toGrid = document.getElementById(toGridId);
+    if (!toGrid) return;
+
+    // Fly animation
+    item.style.transition = 'all 0.4s cubic-bezier(0.34,1.56,0.64,1)';
+    item.style.transform = 'scale(0.5)';
+    item.style.opacity = '0.3';
+    setTimeout(() => {
+      // Reset for grid layout in AI zone
+      if (toZone === 'ai') {
+        item.style.cssText = '';
+        item.className = 'ref-image-item';
+      }
+      item.dataset.zone = toZone;
+      const empty = toGrid.querySelector('.ref-zone-empty');
+      if (empty) empty.remove();
+      toGrid.appendChild(item);
+      item.style.transform = 'scale(1)';
+      item.style.opacity = '1';
+    }, 300);
+  };
+
+  return item;
+}
+
+function closeRefContextMenu() {
+  const m = document.getElementById('refContextMenu');
+  if (m) m.remove();
+}
+
+// ==================== DESIGN GENERATION ====================
+async function renderDesignStyleOptions() {
+  if (!globalPlanData) return;
+
+  const systemPrompt = `K-뷰티 패키징 디자이너입니다. 제품 컨셉에 딱 맞는 3가지 디자인 방향을 추천합니다.
+
+중요: 스타일명은 반드시 일상적이고 쉬운 한국어로 작성하세요. 전문 용어나 영어 단어 사용 금지.
+좋은 예시: "깔끔 단정한 느낌", "고급스러운 약국 느낌", "따뜻한 손편지 느낌", "시원한 물방울 느낌", "은은한 꽃향기 느낌"
+나쁜 예시: "미니멀 모던", "럭셔리 프리미엄", "내추럴 클린", "모노크롬 시크"
+
+JSON: {"styles":[{"name":"함축적이고 이해하기 쉬운 한국어 스타일명","prompt_hint":"영문 이미지 생성 프롬프트 힌트"},...]}`;
+
+  const userPrompt = `제품: ${globalPlanData.productName}
+컨셉: ${globalPlanData.concept}
+타겟: ${(globalPlanData.targets || []).join(', ')}
+특징: ${(globalPlanData.features || []).join(', ')}
+
+이 제품에 어울리는 3가지 디자인 방향을 쉬운 한국어로 제안해주세요.`;
+
+  try {
+    const raw = await callClaude(systemPrompt, userPrompt);
+    const jsonStr = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const result = JSON.parse(jsonStr);
+    globalPlanData.designStyles = result.styles || [];
+  } catch(e) {
+    globalPlanData.designStyles = [
+      { name: '깔끔 단정한 느낌', prompt_hint: 'clean minimalist elegant packaging' },
+      { name: '고급스러운 약국 느낌', prompt_hint: 'luxury derma pharmacy clinical' },
+      { name: '따뜻한 자연 느낌', prompt_hint: 'warm natural botanical soft' }
+    ];
+  }
+
+  const container = document.getElementById('designStyleLabels');
+  if (container) {
+    container.innerHTML = globalPlanData.designStyles.map((s, i) => {
+      const colors = ['chip-positioning','chip-feature','chip-target'];
+      return `<span class="chip ${colors[i % 3]}">${s.name}</span>`;
+    }).join('');
+  }
+}
+
+function buildDesignPrompt(styleIdx) {
+  if (!globalPlanData) return '';
+  const styles = globalPlanData.designStyles || [];
+  const style = styles[styleIdx] || { name: '', prompt_hint: '' };
+
+  // Gather AI reference image count for context
+  const aiRefGrid = document.getElementById('refAiGrid');
+  const aiRefCount = aiRefGrid ? aiRefGrid.querySelectorAll('.ref-image-item').length : 0;
+  const refContext = aiRefCount > 0
+    ? `Reference: The design should be inspired by ${aiRefCount} reference images showing luxury skincare packaging aesthetics.`
+    : '';
+
+  // Include reference URL if provided
+  const refUrl = document.getElementById('planRefs')?.value;
+  const refUrlContext = refUrl ? `Reference product URL: ${refUrl}` : '';
+
+  // Include key features and positioning
+  const features = (globalPlanData.features || []).slice(0, 3).join(', ');
+  const positioning = globalPlanData.positioning || '';
+
+  return `A professional studio product photo of a Korean beauty ${globalPlanData.container || 'cosmetic bottle'}, ${style.prompt_hint || 'elegant luxury'} style. Colors: ${globalPlanData.colors.join(', ')}. Clean white background, soft studio lighting. Photorealistic cosmetic packaging design.`;
+}
+
+function switchEngine(engine) {
+  currentDesignEngine = engine;
+  const desc = document.getElementById('engineDesc');
+  if (desc) desc.textContent = engine === 'nano' ?
+    '나노바나나(Gemini)로 3가지 컨셉 이미지를 생성합니다.' :
+    'DALL-E 3로 3가지 컨셉 이미지를 생성합니다. (OpenAI 키 필요)';
+}
+
+async function generateDesigns() {
+  const btn = document.getElementById('designGenBtn');
+  if (!globalPlanData) {
+    showToast('먼저 기획을 완료해주세요', 'warning');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>디자인 생성 중...';
+  const resultsDiv = document.getElementById('designResults');
+  resultsDiv.innerHTML = '';
+
+  try {
+    let styles = globalPlanData.designStyles || [];
+    // Ensure we have at least fallback styles
+    if (styles.length === 0) {
+      styles = [
+        { name: '깔끔 단정한 느낌', prompt_hint: 'clean minimalist elegant packaging' },
+        { name: '고급스러운 느낌', prompt_hint: 'luxury premium gold packaging' },
+        { name: '부드러운 자연 느낌', prompt_hint: 'warm natural botanical soft packaging' }
+      ];
+      globalPlanData.designStyles = styles;
+    }
+    const total = Math.min(3, styles.length);
+    for (let i = 0; i < total; i++) {
+      // 12-second delay between calls (not before the first one)
+      if (i > 0 && currentDesignEngine === 'nano') {
+        for (let sec = 12; sec > 0; sec--) {
+          btn.innerHTML = `<span class="spinner"></span>${i+1}/${total} 생성 대기 ${sec}초...`;
+          await new Promise(r => setTimeout(r, 1000));
+        }
+      }
+      btn.innerHTML = `<span class="spinner"></span>${i+1}/${total} 디자인 생성 중...`;
+
+      const prompt = buildDesignPrompt(i);
+      let imageUrl = null;
+
+      if (currentDesignEngine === 'nano') {
+        imageUrl = await callNanoBanana(prompt);
+      } else {
+        imageUrl = await callDallE(prompt);
+      }
+
+      if (imageUrl) {
+        const item = document.createElement('div');
+        item.className = 'design-item';
+        const safeUrl = imageUrl.length > 100 ? 'INLINE_IMG_' + i : imageUrl;
+        const styleName = styles[i]?.name || `컨셉 ${i+1}`;
+        item.innerHTML = `
+          <div class="design-result-img" onclick="selectDesignImage(this, this.querySelector('img').src)">
+            <img src="${imageUrl}" alt="Design ${i+1}">
+          </div>
+          <div style="text-align:center;color:#fff;font-size:13px;margin:6px 0 2px;opacity:0.85;font-weight:500">${styleName}</div>
+          <button class="design-select-btn" onclick="selectDesignImage(this.parentElement.querySelector('.design-result-img'), this.parentElement.querySelector('img').src)">선택</button>
+        `;
+        resultsDiv.appendChild(item);
+        showToast(`${i+1}/${total} 디자인이 생성되었습니다 — ${styleName}`, 'info');
+      }
+    }
+    if (resultsDiv.innerHTML === '') {
+      showToast('이미지 생성에 실패했습니다. API 키를 확인해주세요.', 'warning');
+    }
+  } catch(e) {
+    showToast('디자인 생성 실패: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '🍌 3가지 디자인 생성';
+  }
+}
+
+function selectDesignImage(el, imageUrl) {
+  document.querySelectorAll('.design-result-img').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+  globalPlanData.selectedDesign = imageUrl;
+  saveData();
+  renderDetailLinkedBanner();
+  renderUspLinkedBanner();
+  showToast('디자인이 선택되었습니다', 'success');
+}
+
+async function generateDesignSingle(e) {
+  const btn = e ? e.target : document.querySelector('[onclick*="generateDesignSingle"]');
+  if (!btn) return;
+  btn.disabled = true;
+  btn.textContent = '생성 중...';
+
+  try {
+    const prompt = buildDesignPrompt(0);
+    let imageUrl = null;
+
+    if (currentDesignEngine === 'nano') {
+      imageUrl = await callNanoBanana(prompt);
+    } else {
+      imageUrl = await callDallE(prompt);
+    }
+
+    if (imageUrl) {
+      const resultsDiv = document.getElementById('designResults');
+      const item = document.createElement('div');
+      item.className = 'design-item';
+      item.innerHTML = `
+        <div class="design-result-img" onclick="selectDesignImage(this, this.querySelector('img').src)">
+          <img src="${imageUrl}" alt="Design">
+        </div>
+        <button class="design-select-btn" onclick="selectDesignImage(this.parentElement.querySelector('.design-result-img'), this.parentElement.querySelector('img').src)">선택</button>
+      `;
+      resultsDiv.appendChild(item);
+      showToast('1장이 생성되었습니다', 'success');
+    }
+  } catch(e) {
+    showToast('생성 실패: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '1장만 빠르게';
+  }
+}
+
+const NANO_MODELS = [
+  'gemini-2.0-flash-exp',
+  'gemini-2.0-flash-preview-image-generation',
+  'gemini-2.5-flash-preview-image-generation',
+  'gemini-2.0-flash'
+];
+
+async function callNanoBanana(prompt, retryCount = 0, modelIdx = 0) {
+  const key = getGeminiKey();
+  if (!key) throw new Error('Google AI API 키를 설정해주세요 (⚙️ 설정)');
+
+  if (modelIdx >= NANO_MODELS.length) {
+    throw new Error('모든 Gemini 모델에서 이미지 생성 실패. Google AI Studio에서 API 키가 유효한지 확인해주세요.');
+  }
+  const model = NANO_MODELS[modelIdx];
+  console.log(`[NanoBanana] Trying model: ${model} (attempt ${retryCount + 1})`);
+
+  // Shorten prompt for reliability
+  const shortPrompt = prompt.length > 500 ? prompt.substring(0, 500) : prompt;
+
+  let resp;
+  try {
+    resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{ text: shortPrompt }]
+        }],
+        generationConfig: {
+          responseModalities: ['TEXT', 'IMAGE']
+        }
+      })
+    });
+  } catch (networkErr) {
+    console.error(`[NanoBanana] Network error:`, networkErr);
+    throw new Error('네트워크 오류. 인터넷 연결을 확인해주세요.');
+  }
+
+  // 404 = model not found → try next model
+  if (resp.status === 404) {
+    console.warn(`[NanoBanana] Model ${model} not found (404), trying next...`);
+    return callNanoBanana(prompt, retryCount, modelIdx + 1);
+  }
+
+  // 429 = rate limit → exponential backoff
+  if (resp.status === 429) {
+    if (retryCount < 3) {
+      const waitSec = 10 + retryCount * 10;
+      console.warn(`[NanoBanana] 429 rate limit, waiting ${waitSec}s (retry ${retryCount + 1}/3)...`);
+      showToast(`API 대기 중... ${waitSec}초 후 재시도`, 'warning');
+      await new Promise(r => setTimeout(r, waitSec * 1000));
+      return callNanoBanana(prompt, retryCount + 1, modelIdx);
+    }
+    throw new Error('API 사용량 초과. 1~2분 후 다시 시도하세요.');
+  }
+
+  // 400 = bad request → might not support image generation, try next model
+  if (resp.status === 400) {
+    const errText = await resp.text();
+    console.warn(`[NanoBanana] 400 error on ${model}:`, errText.substring(0, 200));
+    if (modelIdx + 1 < NANO_MODELS.length) {
+      return callNanoBanana(prompt, retryCount, modelIdx + 1);
+    }
+    throw new Error(`이미지 생성 미지원 모델. 다른 API 키를 시도하거나 DALL-E로 전환하세요.`);
+  }
+
+  if (!resp.ok) {
+    const err = await resp.text();
+    console.error(`[NanoBanana] Error ${resp.status} on ${model}:`, err.substring(0, 300));
+    // Try next model for any server error
+    if (resp.status >= 500 && modelIdx + 1 < NANO_MODELS.length) {
+      return callNanoBanana(prompt, retryCount, modelIdx + 1);
+    }
+    throw new Error(`Gemini 오류 (${resp.status}). 콘솔(F12)에서 상세 내용을 확인하세요.`);
+  }
+
+  const data = await resp.json();
+  console.log(`[NanoBanana] Response from ${model}:`, JSON.stringify(data).substring(0, 300));
+
+  // Extract base64 image from response
+  const candidates = data.candidates || [];
+  for (const candidate of candidates) {
+    const parts = candidate.content?.parts || [];
+    for (const part of parts) {
+      if (part.inlineData) {
+        console.log(`[NanoBanana] Image generated successfully via ${model}`);
+        return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+      }
+    }
+  }
+
+  // No image in response — try next model (this model might not support image output)
+  console.warn(`[NanoBanana] No image in response from ${model}, trying next...`);
+  if (modelIdx + 1 < NANO_MODELS.length) {
+    return callNanoBanana(prompt, retryCount, modelIdx + 1);
+  }
+  throw new Error('이미지가 포함되지 않은 응답. DALL-E 엔진으로 전환해보세요.');
+}
+
+async function callDallE(prompt) {
+  const key = getOpenaiKey();
+  if (!key) throw new Error('OpenAI 키가 필요합니다');
+
+  const resp = await fetch('https://api.openai.com/v1/images/generations', {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + key,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: 'dall-e-3',
+      prompt: prompt,
+      n: 1,
+      size: '1024x1024',
+      quality: 'hd'
+    })
+  });
+
+  if (!resp.ok) {
+    const err = await resp.text();
+    throw new Error(`DALL-E API 오류`);
+  }
+
+  const data = await resp.json();
+  return data.data?.[0]?.url || null;
+}
+
+// ==================== TAB 2: USP 도출 ====================
+function initUspChat() {
+  const msgDiv = document.getElementById('uspChatMessages');
+  if (msgDiv && msgDiv.children.length === 0) {
+    const aiMsg = document.createElement('div');
+    aiMsg.className = 'usp-message ai';
+    aiMsg.innerHTML = `<div class="usp-message-content">${USP_QUESTIONS[0]}</div>`;
+    msgDiv.appendChild(aiMsg);
+  }
+}
+
+function renderUspLinkedBanner() {
+  const banner = document.getElementById('uspLinkedBanner');
+  if (!globalPlanData) {
+    banner.style.display = 'none';
+    return;
+  }
+
+  banner.style.display = 'block';
+  banner.innerHTML = `
+    <div class="linked-banner">
+      ${globalPlanData.selectedDesign ? `<div class="linked-banner-thumb"><img src="${globalPlanData.selectedDesign}" alt="Design"></div>` : ''}
+      <div class="linked-banner-info">
+        <strong>${globalPlanData.productName}</strong><br>
+        ${globalPlanData.concept.substring(0, 80)}...
+      </div>
+    </div>
+  `;
+}
+
+let uspSending = false;
+
+async function submitUspAnswer() {
+  if (uspSending || window._imeComposing) return;
+  const input = document.getElementById('uspInput');
+  const val = input.value.trim();
+  if (!val) return;
+
+  uspSending = true;
+  input.value = '';
+
+  const msgDiv = document.getElementById('uspChatMessages');
+  const userMsg = document.createElement('div');
+  userMsg.className = 'usp-message user';
+  userMsg.innerHTML = `<div class="usp-message-content">${val}</div>`;
+  msgDiv.appendChild(userMsg);
+
+  uspAnswers.push(val);
+  uspStep++;
+
+  if (uspStep >= USP_QUESTIONS.length) {
+    uspSending = false;
+    generateUsp(uspAnswers);
+    return;
+  }
+
+  const nextQ = USP_QUESTIONS[uspStep];
+  setTimeout(() => {
+    const aiMsg = document.createElement('div');
+    aiMsg.className = 'usp-message ai';
+    aiMsg.innerHTML = `<div class="usp-message-content">${nextQ}</div>`;
+    msgDiv.appendChild(aiMsg);
+    msgDiv.scrollTop = msgDiv.scrollHeight;
+    uspSending = false;
+  }, 300);
+}
+
+async function generateUsp(answers) {
+  const msgDiv = document.getElementById('uspChatMessages');
+  const loadMsg = document.createElement('div');
+  loadMsg.className = 'usp-message ai';
+  loadMsg.innerHTML = `<div class="usp-message-content"><span class="spinner"></span>USP를 도출하고 있습니다...</div>`;
+  msgDiv.appendChild(loadMsg);
+
+  const systemPrompt = `당신은 K-뷰티 USP 전문가입니다. 제품 정보와 사용자의 답변을 바탕으로 강력한 USP를 도출합니다. JSON으로 응답: {"usp":"한 문장 USP","reasoning":"4~5줄 설명","keywords":["키워드1","키워드2","키워드3"]}`;
+
+  const userPrompt = `제품: ${globalPlanData?.productName || ''}
+컨셉: ${globalPlanData?.concept || ''}
+
+사용자 답변:
+1. 타겟 고민: ${answers[0] || ''}
+2. 차별점: ${answers[1] || ''}
+3. 고객 변화: ${answers[2] || ''}
+
+이를 바탕으로 강력한 USP를 도출해주세요.`;
+
+  try {
+    const raw = await callClaude(systemPrompt, userPrompt);
+    const jsonStr = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const result = JSON.parse(jsonStr);
+    globalUspData = result;
+    saveData();
+
+    loadMsg.remove();
+    const uspMsg = document.createElement('div');
+    uspMsg.className = 'usp-message ai';
+    uspMsg.innerHTML = `<div class="usp-message-content">
+      <strong style="color:#a5b4fc">${result.usp}</strong><br><br>
+      ${result.reasoning}
+    </div>`;
+    msgDiv.appendChild(uspMsg);
+
+    const resultEl = document.getElementById('uspResult');
+    resultEl.style.display = 'block';
+    resultEl.innerHTML = `
+      <div class="glass-card fade-in" style="margin-top:16px">
+        <div class="section-label">도출된 USP</div>
+        <div class="highlight-purple">
+          <h3 style="color:#34d399">${result.usp}</h3>
+          <p>${result.reasoning}</p>
+          <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:6px">
+            ${result.keywords.map(k => `<span class="chip chip-feature">${k}</span>`).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+
+    msgDiv.scrollTop = msgDiv.scrollHeight;
+  } catch(e) {
+    loadMsg.innerHTML = `<div class="usp-message-content" style="color:#f87171">오류: ${e.message}</div>`;
+  }
+}
+
+// ==================== TAB 3: 상세페이지 구조 ====================
+function renderDetailLinkedBanner() {
+  const banner = document.getElementById('detailLinkedBanner');
+  if (!globalPlanData) {
+    banner.style.display = 'none';
+    return;
+  }
+
+  banner.style.display = 'block';
+  banner.innerHTML = `
+    <div class="linked-banner">
+      ${globalPlanData.selectedDesign ? `<div class="linked-banner-thumb"><img src="${globalPlanData.selectedDesign}" alt="Design"></div>` : ''}
+      <div class="linked-banner-info">
+        <strong>${globalPlanData.productName}</strong><br>
+        USP: ${globalUspData?.usp || '아직 도출되지 않음'}
+      </div>
+    </div>
+  `;
+}
+
+async function generateDetailStructure() {
+  const btn = document.getElementById('detailGenBtn');
+  if (!globalPlanData) {
+    showToast('먼저 기획을 완료해주세요', 'warning');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>구조 생성 중...';
+
+  const extra = document.getElementById('detailExtra').value;
+  const refUrl = document.getElementById('detailRef').value;
+
+  const linkedInfo = [];
+  if (globalPlanData) linkedInfo.push(`제품명: ${globalPlanData.productName}, 컨셉: ${globalPlanData.concept}`);
+  if (globalUspData) linkedInfo.push(`USP: ${globalUspData.usp}`);
+
+  const systemPrompt = `당신은 K-뷰티 상세페이지 구조 설계자입니다. 3가지 스타일의 상세페이지 구조를 제안합니다. JSON: {"styles":[{"name":"스타일명","badge":"A|B|C","sections":[{"title":"섹션명","type":"이미지|텍스트|특징","height":"tall|medium|short","description":"설명"}],"copyDirection":"카피 방향"}]}`;
+
+  const userPrompt = `다음 조건으로 상세페이지 3가지 스타일 구조를 제안해주세요:
+
+${linkedInfo.length > 0 ? linkedInfo.join('\n') : '제품 정보 없음'}
+레퍼런스 URL: ${refUrl || '없음'}
+추가 요구사항: ${extra || '없음'}
+
+각 스타일별로 6~8개 섹션으로 구성해주세요.`;
+
+  try {
+    const raw = await callClaude(systemPrompt, userPrompt);
+    const jsonStr = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const result = JSON.parse(jsonStr);
+    renderDetailResult(result);
+    showToast('상세페이지 구조가 생성되었습니다!', 'success');
+  } catch(e) {
+    showToast('오류: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '3가지 스타일 구조 생성 ↗';
+  }
+}
+
+function renderDetailResult(result) {
+  const el = document.getElementById('detailResult');
+  el.style.display = 'block';
+  const badgeColors = { 'A': '#8b5cf6', 'B': '#34d399', 'C': '#f87171' };
+  const heightMap = { tall: '100px', medium: '70px', short: '45px' };
+
+  el.innerHTML = `
+    <div class="section-label fade-in" style="margin-top:20px">와이어프레임 미리보기</div>
+    <div class="grid-3 fade-in">
+      ${result.styles.map(s => `
+        <div class="wireframe">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+            <span class="wf-badge" style="background:${badgeColors[s.badge]||'#8b5cf6'}22;color:${badgeColors[s.badge]||'#8b5cf6'};border:1px solid ${badgeColors[s.badge]||'#8b5cf6'}44">스타일 ${s.badge}</span>
+            <strong style="font-size:14px">${s.name}</strong>
+          </div>
+          ${s.sections.map(sec => `<div class="wf-block" style="height:${heightMap[sec.height]||'60px'}">${sec.title}</div>`).join('')}
+          <p class="muted" style="margin-top:8px;font-size:12px">${s.copyDirection}</p>
+          <button class="btn-primary btn-sm" style="margin-top:10px;width:100%" onclick="generateDetailCopy('${s.badge}','${s.name}',${JSON.stringify(s.sections).replace(/'/g,"\\'")},'${s.copyDirection.replace(/'/g,"\\'")}')">상세 카피 작성 ↗</button>
+        </div>
+      `).join('')}
+    </div>
+    <div id="detailCopyResult"></div>
+  `;
+}
+
+async function generateDetailCopy(badge, name, sections, direction) {
+  const resultEl = document.getElementById('detailCopyResult');
+  resultEl.innerHTML = `<div class="glass-card fade-in" style="margin-top:16px"><p><span class="spinner"></span> 스타일 ${badge} — ${name} 카피를 작성하고 있습니다...</p></div>`;
+
+  const linkedInfo = [];
+  if (globalPlanData) linkedInfo.push(`제품명: ${globalPlanData.productName}, 컨셉: ${globalPlanData.concept}`);
+  if (globalUspData) linkedInfo.push(`USP: ${globalUspData.usp}`);
+
+  const sectionList = (typeof sections === 'string' ? JSON.parse(sections) : sections);
+  const systemPrompt = "K-뷰티 상세페이지 카피라이터로서, 각 섹션별로 매력적이고 구매 전환율을 높이는 카피를 작성하세요. JSON: [{\"title\":\"섹션\",\"headline\":\"헤드라인\",\"body\":\"본문\"}]";
+  const userPrompt = `스타일: ${name}\n카피 방향: ${direction}\n${linkedInfo.join('\n')}\n\n섹션: ${sectionList.map(s => `${s.title}: ${s.description}`).join('\n')}\n\n각 섹션별 카피를 작성해주세요.`;
+
+  try {
+    const raw = await callClaude(systemPrompt, userPrompt);
+    const jsonStr = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const copies = JSON.parse(jsonStr);
+
+    resultEl.innerHTML = `<div class="glass-card fade-in" style="margin-top:16px">
+      <div class="section-label">📝 스타일 ${badge} — ${name} 카피</div>
+      <div class="copy-result">
+        ${copies.map(c => `
+          <div class="copy-section">
+            <h4>${c.title}</h4>
+            <p><strong>${c.headline}</strong></p>
+            <p>${c.body}</p>
+          </div>
+        `).join('<hr style="border-color:rgba(255,255,255,0.06);margin:12px 0">')}
+      </div>
+    </div>`;
+    showToast(`스타일 ${badge} 카피가 작성되었습니다!`, 'success');
+  } catch(e) {
+    resultEl.innerHTML = `<div class="glass-card" style="margin-top:16px"><p style="color:#f87171">오류: ${e.message}</p></div>`;
+  }
+}
+
+// ==================== TAB 4: 진행현황 ====================
+function renderProducts() {
+  const container = document.getElementById('productsList');
+  if (!container) return;
+
+  if (products.length === 0) {
+    container.innerHTML = '<p style="grid-column:span 3;text-align:center;color:#6b6b80">아직 추가된 상품이 없습니다</p>';
+    return;
+  }
+
+  container.innerHTML = products.map(p => `
+    <div class="product-card ${selectedProductId === p.id ? 'active' : ''}" onclick="selectProduct('${p.id}')">
+      ${p.image ? `<div class="product-card-thumb"><img src="${p.image}" alt="Product"></div>` : '<div class="product-card-thumb" style="background:rgba(255,255,255,0.04)"></div>'}
+      <div class="product-card-name">${p.name}</div>
+      <div class="product-card-stage">${p.stage || '기획'}</div>
+    </div>
+  `).join('');
+}
+
+function openAddProductModal() {
+  closeModal();
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.id = 'modalOverlay';
+  overlay.innerHTML = `<div class="modal">
+    <h2>상품 추가</h2>
+    <label>상품명</label>
+    <input type="text" id="productNameInput" placeholder="상품명 입력">
+    <label style="margin-top:12px">진행 단계</label>
+    <select id="productStageSelect" style="width:100%;padding:10px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:#e8e8f0;margin-bottom:20px;font-family:Pretendard">
+      ${STAGES.map(s => `<option value="${s}">${s}</option>`).join('')}
+    </select>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="closeModal()">취소</button>
+      <button class="btn-primary" onclick="addProduct()">추가</button>
+    </div>
+  </div>`;
+  document.body.appendChild(overlay);
+}
+
+function addProduct() {
+  const name = document.getElementById('productNameInput').value.trim();
+  const stage = document.getElementById('productStageSelect').value;
+  if (!name) { showToast('상품명을 입력해주세요', 'warning'); return; }
+
+  const product = {
+    id: Date.now().toString(),
+    name: name,
+    stage: stage,
+    image: globalPlanData?.selectedDesign || null,
+    createdAt: new Date().toISOString()
+  };
+
+  products.push(product);
+  saveData();
+  renderProducts();
+  closeModal();
+  showToast('상품이 추가되었습니다', 'success');
+}
+
+function selectProduct(id) {
+  selectedProductId = id;
+  renderProducts();
+  renderProductDetail(id);
+}
+
+function renderProductDetail(id) {
+  const product = products.find(p => p.id === id);
+  const detailEl = document.getElementById('productDetail');
+  if (!product || !detailEl) return;
+
+  detailEl.style.display = 'block';
+  const designImg = product.image || globalPlanData?.selectedDesign || null;
+
+  detailEl.innerHTML = `
+    <div class="glass-card fade-in">
+      <div style="display:flex;gap:20px;align-items:flex-start">
+        ${designImg ? `<div style="width:120px;height:120px;border-radius:12px;overflow:hidden;flex-shrink:0;border:1px solid rgba(255,255,255,0.1)"><img src="${designImg}" style="width:100%;height:100%;object-fit:cover" alt="Design"></div>` : ''}
+        <div style="flex:1">
+          <h3 style="font-size:18px;margin-bottom:8px">${product.name}</h3>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+            ${STAGES.map(s => `<span class="chip ${s === product.stage ? 'chip-feature' : ''}" style="cursor:pointer;${s === product.stage ? 'font-weight:700' : 'opacity:0.5'}" onclick="updateProductStage('${id}','${s}')">${s}</span>`).join('')}
+          </div>
+          ${globalPlanData ? `<p style="font-size:13px;color:#8888a0">컨셉: ${globalPlanData.concept?.substring(0, 100) || ''}...</p>` : ''}
+          ${globalUspData ? `<p style="font-size:13px;color:#34d399;margin-top:6px">USP: ${globalUspData.usp || ''}</p>` : ''}
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button class="btn-secondary btn-sm" onclick="deleteProduct('${id}')">삭제</button>
+      </div>
+    </div>
+  `;
+}
+
+function updateProductStage(id, stage) {
+  const product = products.find(p => p.id === id);
+  if (product) {
+    product.stage = stage;
+    saveData();
+    renderProducts();
+    renderProductDetail(id);
+    showToast('진행 단계가 변경되었습니다', 'success');
+  }
+}
+
+function deleteProduct(id) {
+  if (!confirm('이 상품을 삭제하시겠습니까?')) return;
+  products = products.filter(p => p.id !== id);
+  selectedProductId = null;
+  saveData();
+  renderProducts();
+  document.getElementById('productDetail').style.display = 'none';
+  showToast('상품이 삭제되었습니다', 'info');
+}
+</script>
+
+
+
+</body></html>
